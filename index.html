@@ -588,7 +588,137 @@
             box-shadow: var(--box-shadow);
             border: 1px solid var(--border-color);
         }
-        
+
+        /* 购买渠道列表 */
+        .channel-list {
+            background: var(--background-primary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        /* 快捷管理卡片 */
+        .quick-manage-card {
+            background: var(--background-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--box-shadow);
+        }
+
+        .quick-manage-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .quick-manage-card button {
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .quick-manage-card:hover button {
+            opacity: 1;
+        }
+
+        /* 管理弹窗样式 */
+        #category-manage-modal,
+        #channel-manage-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #category-manage-modal.active,
+        #channel-manage-modal.active {
+            display: flex;
+        }
+
+        #category-manage-modal > div,
+        #channel-manage-modal > div {
+            background: var(--background-primary);
+            border-radius: 16px;
+            padding: 28px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* 管理列表项样式 */
+        .manage-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .manage-item:last-child {
+            border-bottom: none;
+        }
+
+        .manage-item:hover {
+            background: var(--background-secondary);
+            border-radius: 8px;
+            margin: 0 -4px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .manage-item-name {
+            font-weight: 500;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .manage-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .manage-item-actions button {
+            padding: 6px 12px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .manage-item-actions button.edit {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .manage-item-actions button.edit:hover {
+            background: var(--primary-color);
+            opacity: 0.8;
+        }
+
+        .manage-item-actions button.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .manage-item-actions button.delete:hover {
+            background: #dc3545;
+        }
+
         .category-item {
             padding: 16px;
             border-bottom: 1px solid var(--border-color);
@@ -1336,16 +1466,32 @@
                     </div>
                 </div>
                 
-                <!-- 分类管理 -->
+                <!-- 快捷管理 -->
                 <div class="settings-section">
-                    <h4>分类管理</h4>
-                    <p>管理物品分类，添加、编辑或删除分类</p>
-                    <div class="category-list">
-                        <!-- 分类项将通过JavaScript动态生成 -->
+                    <h4>快捷管理</h4>
+                    <p>快速管理分类和购买渠道</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <!-- 分类管理卡片 -->
+                        <div class="quick-manage-card" id="category-manage-card">
+                            <div style="font-size: 32px; margin-bottom: 8px;">📁</div>
+                            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">分类管理</div>
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
+                                当前 <span id="category-count">0</span> 个分类
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%; font-size: 14px;">点击管理 →</button>
+                        </div>
+                        <!-- 购买渠道管理卡片 -->
+                        <div class="quick-manage-card" id="channel-manage-card">
+                            <div style="font-size: 32px; margin-bottom: 8px;">🛒</div>
+                            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">购买渠道管理</div>
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
+                                当前 <span id="channel-count">0</span> 个渠道
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%; font-size: 14px;">点击管理 →</button>
+                        </div>
                     </div>
-                    <button id="add-category-btn" class="btn btn-primary" style="margin-top: 16px; width: 100%;">添加分类</button>
                 </div>
-                
+
                 <!-- 主题选择 -->
                 <div class="settings-section">
                     <h4>主题配色</h4>
@@ -1433,16 +1579,8 @@
             <div class="form-group">
                 <label>购买渠道 <span style="color: #f5222d;">*</span></label>
                 <select id="item-purchase-channel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                    <option value="淘宝">淘宝</option>
-                    <option value="京东">京东</option>
-                    <option value="抖音">抖音</option>
-                    <option value="拼多多">拼多多</option>
-                    <option value="其他" selected>其他</option>
+                    <!-- 购买渠道选项将通过JavaScript动态生成 -->
                 </select>
-            </div>
-            <div class="form-group" id="custom-channel-group" style="display: block;">
-                <label>自定义渠道</label>
-                <input type="text" id="item-custom-channel" placeholder="请输入自定义渠道名称">
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                 <button class="btn btn-secondary" id="cancel-add">取消</button>
@@ -1490,28 +1628,16 @@
             <div class="form-group">
                 <label>购买渠道</label>
                 <select id="detail-item-purchase-channel" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                    <option value="">请选择购买渠道</option>
-                    <option value="淘宝">淘宝</option>
-                    <option value="京东">京东</option>
-                    <option value="抖音">抖音</option>
-                    <option value="拼多多">拼多多</option>
-                    <option value="其他">其他</option>
+                    <!-- 购买渠道选项将通过JavaScript动态生成 -->
                 </select>
-            </div>
-            <div class="form-group" id="detail-custom-channel-group" style="display: none;">
-                <label>自定义渠道</label>
-                <input type="text" id="detail-item-custom-channel" placeholder="请输入自定义渠道名称">
             </div>
             <div class="form-group" style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 16px;">
                 <label style="font-weight: 600; margin-bottom: 12px; display: block; font-size: 14px;">状态</label>
-                <select id="detail-item-status" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; margin-bottom: 10px;">
-                    <option value="in_use">使用中</option>
-                    <option value="retired">已退役</option>
-                    <option value="lost">已遗失</option>
-                    <option value="gifted">已送人</option>
-                    <option value="donated">已捐赠</option>
-                    <option value="damaged">已损坏</option>
-                </select>
+                <div class="custom-select" id="custom-detail-status-select">
+                    <div class="custom-select-trigger">请选择状态</div>
+                    <div class="custom-select-options"></div>
+                    <input type="hidden" id="detail-item-status" value="">
+                </div>
                 <div id="retired-options" style="display: none; margin-left: 8px; padding-left: 16px; border-left: 2px solid #e5e7eb;">
                     <div style="margin-bottom: 10px; display: flex; align-items: center;">
                         <input type="checkbox" id="detail-item-sold-secondhand" style="margin-right: 6px; cursor: pointer;">
@@ -1532,25 +1658,51 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- 分类管理弹窗 -->
+    <div id="category-manage-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: white; padding: 28px; border-radius: 16px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 20px; text-align: center; font-size: 18px;">📁 分类管理</h3>
+            <div id="category-manage-list" style="margin-bottom: 20px;">
+                <!-- 分类列表项将通过JavaScript动态生成 -->
+            </div>
+            <button id="add-category-in-modal" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px;">+ 添加新分类</button>
+            <button id="close-category-modal" class="btn btn-secondary" style="width: 100%; margin-top: 12px; padding: 12px; font-size: 14px;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 购买渠道管理弹窗 -->
+    <div id="channel-manage-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: white; padding: 28px; border-radius: 16px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 20px; text-align: center; font-size: 18px;">🛒 购买渠道管理</h3>
+            <div id="channel-manage-list" style="margin-bottom: 20px;">
+                <!-- 渠道列表项将通过JavaScript动态生成 -->
+            </div>
+            <button id="add-channel-in-modal" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px;">+ 添加新渠道</button>
+            <button id="close-channel-modal" class="btn btn-secondary" style="width: 100%; margin-top: 12px; padding: 12px; font-size: 14px;">关闭</button>
+        </div>
+    </div>
+
     <script>
         // 存储管理模块
         class Storage {
             constructor() {
                 this.itemsKey = 'wucanglu_items';
                 this.categoriesKey = 'wucanglu_categories';
+                this.channelsKey = 'wucanglu_channels';
                 this.settingsKey = 'wucanglu_settings';
                 this.useUToolsDB = typeof utools !== 'undefined' && utools.db;
                 console.log('存储方式:', this.useUToolsDB ? 'uTools 本地数据库' : 'localStorage');
-                
+
                 // 检测localStorage是否可用
                 this.localStorageAvailable = this.isLocalStorageAvailable();
                 console.log('localStorage是否可用:', this.localStorageAvailable);
-                
+
                 // 内存存储作为后备方案
                 this.memoryStorage = {
                     items: [],
                     categories: [],
+                    channels: [],
                     settings: {
                         theme: 'light',
                         autoBackup: false
@@ -1591,6 +1743,22 @@
                     console.log('初始化默认分类结果:', result);
                 }
                 
+                // 初始化默认购买渠道
+                const channels = this.getChannels();
+                console.log('当前购买渠道数量:', channels.length);
+                if (!channels.length) {
+                    console.log('初始化默认购买渠道');
+                    const defaultChannels = [
+                        { id: Date.now().toString(), name: '淘宝' },
+                        { id: (Date.now() + 1).toString(), name: '京东' },
+                        { id: (Date.now() + 2).toString(), name: '抖音' },
+                        { id: (Date.now() + 3).toString(), name: '拼多多' },
+                        { id: (Date.now() + 4).toString(), name: '其他' }
+                    ];
+                    const result = this.saveChannels(defaultChannels);
+                    console.log('初始化默认购买渠道结果:', result);
+                }
+
                 // 不再初始化默认物品，让用户从空白状态开始
                 console.log('初始化默认数据完成');
             }
@@ -1615,22 +1783,6 @@
                 if (itemsNeedMigration) {
                     console.log('保存迁移后的物品数据');
                     this.saveItems(migratedItems);
-                }
-
-                // 为没有购买渠道的物品设置默认值
-                let channelNeedMigration = false;
-                const finalItems = (itemsNeedMigration ? migratedItems : items).map(item => {
-                    if (!item.purchaseChannel) {
-                        console.log(`为物品 ${item.name} 设置默认购买渠道: 其他`);
-                        channelNeedMigration = true;
-                        return { ...item, purchaseChannel: '其他' };
-                    }
-                    return item;
-                });
-
-                if (channelNeedMigration) {
-                    console.log('保存购买渠道迁移后的物品数据');
-                    this.saveItems(finalItems);
                 }
 
                 // 修复分类ID
@@ -1879,7 +2031,135 @@
                 console.log('找到的分类:', category);
                 return category || null;
             }
-            
+
+            // 获取所有购买渠道
+            getChannels() {
+                try {
+                    console.log('开始获取购买渠道数据');
+                    if (this.useUToolsDB) {
+                        console.log('使用uTools本地数据库获取购买渠道数据');
+                        const doc = utools.db.get(this.channelsKey);
+                        console.log('从uTools数据库获取到的购买渠道数据:', doc);
+                        const channels = doc ? doc.channels : [];
+                        console.log('解析后的购买渠道数据:', channels);
+                        return channels;
+                    } else if (this.localStorageAvailable) {
+                        console.log('使用localStorage获取购买渠道数据');
+                        const channels = localStorage.getItem(this.channelsKey);
+                        console.log('从localStorage获取到的购买渠道数据:', channels);
+                        const parsedChannels = channels ? JSON.parse(channels) : [];
+                        console.log('解析后的购买渠道数据:', parsedChannels);
+                        return parsedChannels;
+                    } else {
+                        console.log('从内存存储获取购买渠道数据');
+                        return this.memoryStorage.channels;
+                    }
+                } catch (error) {
+                    console.error('获取购买渠道数据失败:', error);
+                    return this.memoryStorage.channels;
+                }
+            }
+
+            // 保存购买渠道列表
+            saveChannels(channels) {
+                try {
+                    console.log('开始保存购买渠道数据:', channels);
+                    if (this.useUToolsDB) {
+                        console.log('使用uTools本地数据库保存购买渠道数据');
+                        const doc = utools.db.get(this.channelsKey);
+                        console.log('获取到的购买渠道文档:', doc);
+                        const putDoc = {
+                            _id: this.channelsKey,
+                            channels: channels
+                        };
+                        // 只有在文档已存在时才添加 _rev
+                        if (doc && doc._rev) {
+                            putDoc._rev = doc._rev;
+                        }
+                        const result = utools.db.put(putDoc);
+                        console.log('保存购买渠道数据结果:', result);
+                        if (result.error) {
+                            console.error('uTools数据库保存失败:', result.message);
+                        }
+                        return result.ok;
+                    } else if (this.localStorageAvailable) {
+                        console.log('使用localStorage保存购买渠道数据');
+                        localStorage.setItem(this.channelsKey, JSON.stringify(channels));
+                        console.log('保存购买渠道数据成功');
+                        return true;
+                    } else {
+                        console.log('保存购买渠道数据到内存存储');
+                        this.memoryStorage.channels = channels;
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('保存购买渠道数据失败:', error);
+                    console.log('保存购买渠道数据到内存存储作为后备');
+                    this.memoryStorage.channels = channels;
+                    return true;
+                }
+            }
+
+            // 添加购买渠道
+            addChannel(channel) {
+                console.log('storage.addChannel被调用:', channel);
+                const channels = this.getChannels();
+                console.log('添加前的购买渠道数量:', channels.length);
+                const newChannel = {
+                    id: Date.now().toString(),
+                    ...channel
+                };
+                console.log('新购买渠道:', newChannel);
+                channels.push(newChannel);
+                console.log('添加后的购买渠道数量:', channels.length);
+                const result = this.saveChannels(channels);
+                console.log('保存结果:', result);
+                return result;
+            }
+
+            // 更新购买渠道
+            updateChannel(id, updates) {
+                console.log('更新购买渠道:', id, updates);
+                const channels = this.getChannels();
+                console.log('更新前的购买渠道:', channels);
+                // 确保ID比较时类型一致，同时支持数字和字符串
+                const index = channels.findIndex(channel => channel.id == id || channel.id.toString() === id.toString());
+                console.log('找到购买渠道索引:', index);
+                if (index !== -1) {
+                    channels[index] = { ...channels[index], ...updates };
+                    console.log('更新后的购买渠道:', channels);
+                    const result = this.saveChannels(channels);
+                    console.log('更新购买渠道结果:', result);
+                    return result;
+                }
+                console.error('购买渠道不存在:', id);
+                return false;
+            }
+
+            // 删除购买渠道
+            deleteChannel(id) {
+                console.log('删除购买渠道:', id);
+                const channels = this.getChannels();
+                console.log('删除前的购买渠道:', channels);
+                // 确保ID比较时类型一致，同时支持数字和字符串
+                const filteredChannels = channels.filter(channel => channel.id != id && channel.id.toString() !== id.toString());
+                console.log('删除后的购买渠道:', filteredChannels);
+                const result = this.saveChannels(filteredChannels);
+                console.log('删除购买渠道结果:', result);
+                return result;
+            }
+
+            // 获取购买渠道详情
+            getChannelById(id) {
+                console.log('获取购买渠道详情:', id);
+                const channels = this.getChannels();
+                console.log('当前购买渠道列表:', channels);
+                // 确保ID比较时类型一致，同时支持数字和字符串
+                const channel = channels.find(channel => channel.id == id || channel.id.toString() === id.toString());
+                console.log('找到的购买渠道:', channel);
+                return channel || null;
+            }
+
             // 获取设置
             getSettings() {
                 try {
@@ -1944,18 +2224,20 @@
                 const data = {
                     items: this.getItems(),
                     categories: this.getCategories(),
+                    channels: this.getChannels(),
                     settings: this.getSettings(),
                     exportTime: new Date().toISOString()
                 };
                 return JSON.stringify(data, null, 2);
             }
-            
+
             // 导入数据
             importData(jsonData) {
                 try {
                     const data = JSON.parse(jsonData);
                     if (data.items) this.saveItems(data.items);
                     if (data.categories) this.saveCategories(data.categories);
+                    if (data.channels) this.saveChannels(data.channels);
                     if (data.settings) this.saveSettings(data.settings);
                     return true;
                 } catch (error) {
@@ -2153,7 +2435,11 @@
                 this.renderItems();
                 console.log('渲染分类列表');
                 this.renderCategories();
-                
+                console.log('渲染购买渠道列表');
+                this.renderChannels();
+                console.log('初始化购买渠道选择框');
+                this.initChannelSelects();
+
                 // 更新统计信息
                 console.log('更新统计信息');
                 this.updateStats();
@@ -3616,105 +3902,503 @@
                 setTimeout(callback, itemCards.length * 50 + 300);
             }
             
-            // 渲染分类列表
+            // 渲染分类列表（更新快捷卡片计数）
             renderCategories() {
-                const categoryList = document.querySelector('#settings-panel .category-list');
-                if (!categoryList) {
-                    console.log('categoryList元素不存在，稍后再渲染');
+                console.log('更新分类计数');
+                const categories = this.storage.getCategories();
+                const categoryCount = document.getElementById('category-count');
+                if (categoryCount) {
+                    categoryCount.textContent = categories.length;
+                }
+            }
+
+            // 在管理弹窗中渲染分类列表
+            renderCategoryManageList() {
+                const manageList = document.getElementById('category-manage-list');
+                if (!manageList) {
+                    console.log('category-manage-list元素不存在');
                     return;
                 }
-                
-                console.log('开始渲染分类列表');
-                categoryList.innerHTML = '';
-                
+
+                console.log('开始渲染分类管理列表');
+                manageList.innerHTML = '';
+
                 const categories = this.storage.getCategories();
                 console.log('获取到的分类数量:', categories.length);
-                console.log('分类数据:', categories);
-                
+
                 categories.forEach(category => {
                     console.log('渲染分类:', category.name);
-                    const categoryItem = document.createElement('div');
-                    categoryItem.className = 'category-item';
-                    categoryItem.innerHTML = `
-                        <span>${category.icon} ${category.name}</span>
-                        <div class="category-actions">
-                            <button class="action-btn edit" data-id="${category.id}">编辑</button>
-                            <button class="action-btn delete" data-id="${category.id}">删除</button>
+                    const item = document.createElement('div');
+                    item.className = 'manage-item';
+                    item.innerHTML = `
+                        <div class="manage-item-name">${category.icon} ${category.name}</div>
+                        <div class="manage-item-actions">
+                            <button class="edit" data-id="${category.id}">编辑</button>
+                            <button class="delete" data-id="${category.id}">删除</button>
                         </div>
                     `;
-                    categoryList.appendChild(categoryItem);
+                    manageList.appendChild(item);
                 });
-                
-                console.log('分类列表渲染完成');
-                
+
+                console.log('分类管理列表渲染完成');
+
                 // 重新绑定分类项的编辑和删除事件
-                this.bindCategoryEvents();
+                this.bindCategoryManageEvents();
             }
-            
-            // 绑定分类项的编辑和删除事件
-            bindCategoryEvents() {
-                console.log('开始绑定分类事件');
-                const categoryList = document.querySelector('#settings-panel .category-list');
-                if (!categoryList) {
-                    console.error('categoryList元素不存在，无法绑定事件');
+
+            // 绑定分类管理弹窗中的编辑和删除事件
+            bindCategoryManageEvents() {
+                const manageList = document.getElementById('category-manage-list');
+                if (!manageList) {
+                    console.error('category-manage-list元素不存在，无法绑定事件');
                     return;
                 }
-                
+
                 // 绑定编辑按钮事件
-                const editBtns = categoryList.querySelectorAll('.action-btn.edit');
-                console.log('找到编辑按钮数量:', editBtns.length);
+                const editBtns = manageList.querySelectorAll('.manage-item-actions button.edit');
                 editBtns.forEach(btn => {
-                    console.log('绑定编辑按钮事件:', btn.dataset.id);
                     btn.onclick = (e) => {
-                        console.log('编辑按钮被点击:', btn.dataset.id);
                         const id = btn.dataset.id;
-                        this.editCategory(id);
+                        this.editCategoryInModal(id);
                     };
                 });
-                
+
                 // 绑定删除按钮事件
-                const deleteBtns = categoryList.querySelectorAll('.action-btn.delete');
-                console.log('找到删除按钮数量:', deleteBtns.length);
+                const deleteBtns = manageList.querySelectorAll('.manage-item-actions button.delete');
                 deleteBtns.forEach(btn => {
-                    console.log('绑定删除按钮事件:', btn.dataset.id);
                     btn.onclick = (e) => {
-                        console.log('删除按钮被点击:', btn.dataset.id);
                         const id = btn.dataset.id;
-                        this.deleteCategory(id);
+                        this.deleteCategoryInModal(id);
                     };
                 });
-                console.log('分类事件绑定完成');
+                console.log('分类管理事件绑定完成');
             }
-            
+
+            // 初始化购买渠道选择框
+            initChannelSelects() {
+                console.log('初始化购买渠道选择框');
+                const channels = this.storage.getChannels();
+                console.log('获取到购买渠道数量:', channels.length);
+
+                // 更新添加物品模态框的购买渠道选择框
+                const addChannelSelect = document.getElementById('item-purchase-channel');
+                if (addChannelSelect) {
+                    addChannelSelect.innerHTML = '';
+                    channels.forEach(channel => {
+                        const option = document.createElement('option');
+                        option.value = channel.name;
+                        option.textContent = channel.name;
+                        addChannelSelect.appendChild(option);
+                    });
+                    // 设置默认值为第一个选项
+                    if (channels.length > 0) {
+                        addChannelSelect.value = channels[0].name;
+                    }
+                }
+
+                // 更新详情模态框的购买渠道选择框
+                const detailChannelSelect = document.getElementById('detail-item-purchase-channel');
+                if (detailChannelSelect) {
+                    detailChannelSelect.innerHTML = '<option value="">请选择购买渠道</option>';
+                    channels.forEach(channel => {
+                        const option = document.createElement('option');
+                        option.value = channel.name;
+                        option.textContent = channel.name;
+                        detailChannelSelect.appendChild(option);
+                    });
+                }
+            }
+
+            // 渲染购买渠道列表（更新快捷卡片计数）
+            renderChannels() {
+                console.log('更新购买渠道计数');
+                const channels = this.storage.getChannels();
+                const channelCount = document.getElementById('channel-count');
+                if (channelCount) {
+                    channelCount.textContent = channels.length;
+                }
+            }
+
+            // 在管理弹窗中渲染购买渠道列表
+            renderChannelManageList() {
+                const manageList = document.getElementById('channel-manage-list');
+                if (!manageList) {
+                    console.log('channel-manage-list元素不存在');
+                    return;
+                }
+
+                console.log('开始渲染购买渠道管理列表');
+                manageList.innerHTML = '';
+
+                const channels = this.storage.getChannels();
+                console.log('获取到的购买渠道数量:', channels.length);
+
+                channels.forEach(channel => {
+                    console.log('渲染购买渠道:', channel.name);
+                    const item = document.createElement('div');
+                    item.className = 'manage-item';
+                    item.innerHTML = `
+                        <div class="manage-item-name">${channel.name}</div>
+                        <div class="manage-item-actions">
+                            <button class="edit" data-id="${channel.id}">编辑</button>
+                            <button class="delete" data-id="${channel.id}">删除</button>
+                        </div>
+                    `;
+                    manageList.appendChild(item);
+                });
+
+                console.log('购买渠道管理列表渲染完成');
+
+                // 重新绑定渠道项的编辑和删除事件
+                this.bindChannelManageEvents();
+            }
+
+            // 绑定购买渠道管理弹窗中的编辑和删除事件
+            bindChannelManageEvents() {
+                const manageList = document.getElementById('channel-manage-list');
+                if (!manageList) {
+                    console.error('channel-manage-list元素不存在，无法绑定事件');
+                    return;
+                }
+
+                // 绑定编辑按钮事件
+                const editBtns = manageList.querySelectorAll('.manage-item-actions button.edit');
+                editBtns.forEach(btn => {
+                    btn.onclick = (e) => {
+                        const id = btn.dataset.id;
+                        this.editChannelInModal(id);
+                    };
+                });
+
+                // 绑定删除按钮事件
+                const deleteBtns = manageList.querySelectorAll('.manage-item-actions button.delete');
+                deleteBtns.forEach(btn => {
+                    btn.onclick = (e) => {
+                        const id = btn.dataset.id;
+                        this.deleteChannelInModal(id);
+                    };
+                });
+                console.log('购买渠道管理事件绑定完成');
+            }
+
+            // 打开分类管理弹窗
+            openCategoryManageModal() {
+                console.log('打开分类管理弹窗');
+                const modal = document.getElementById('category-manage-modal');
+                if (modal) {
+                    this.renderCategoryManageList();
+                    modal.style.display = 'flex';
+                }
+            }
+
+            // 关闭分类管理弹窗
+            closeCategoryManageModal() {
+                console.log('关闭分类管理弹窗');
+                const modal = document.getElementById('category-manage-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // 打开购买渠道管理弹窗
+            openChannelManageModal() {
+                console.log('打开购买渠道管理弹窗');
+                const modal = document.getElementById('channel-manage-modal');
+                if (modal) {
+                    this.renderChannelManageList();
+                    modal.style.display = 'flex';
+                }
+            }
+
+            // 关闭购买渠道管理弹窗
+            closeChannelManageModal() {
+                console.log('关闭购买渠道管理弹窗');
+                const modal = document.getElementById('channel-manage-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            }
+
+            // 在弹窗中添加分类
+            addCategoryInModal() {
+                console.log('addCategoryInModal被调用');
+                this.prompt('添加分类', '请输入分类名称:', '', (confirmed, categoryName) => {
+                    if (confirmed) {
+                        const trimmedName = categoryName?.trim();
+                        if (!trimmedName) {
+                            this.showToast('请输入分类名称！', 'error');
+                            return;
+                        }
+
+                        // 使用默认图标
+                        const result = this.storage.addCategory({ name: trimmedName, icon: '📦' });
+                        console.log('添加分类结果:', result);
+                        if (result) {
+                            this.renderCategoryManageList();
+                            this.renderCategories();
+                            this.renderCategoryTabs();
+                            this.initCustomSelects();
+                            this.showToast('分类添加成功！', 'success');
+                        } else {
+                            this.showToast('分类添加失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 在弹窗中编辑分类
+            editCategoryInModal(id) {
+                console.log('编辑分类:', id);
+                const category = this.storage.getCategoryById(id);
+                if (!category) {
+                    console.error('分类不存在:', id);
+                    this.showToast('分类不存在！', 'error');
+                    return;
+                }
+
+                this.prompt('编辑分类', '请输入新的分类名称:', category.name, (confirmed, categoryName) => {
+                    if (confirmed) {
+                        const trimmedName = categoryName?.trim();
+                        if (!trimmedName) {
+                            this.showToast('请输入分类名称！', 'error');
+                            return;
+                        }
+
+                        const result = this.storage.updateCategory(id, { name: trimmedName });
+                        console.log('编辑分类结果:', result);
+                        if (result) {
+                            this.renderCategoryManageList();
+                            this.renderCategories();
+                            this.renderCategoryTabs();
+                            this.initCustomSelects();
+                            this.showToast('分类编辑成功！', 'success');
+                        } else {
+                            this.showToast('分类编辑失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 在弹窗中删除分类
+            deleteCategoryInModal(id) {
+                console.log('删除分类:', id);
+                this.confirm('删除分类', '确定要删除这个分类吗？', (confirmed) => {
+                    if (confirmed) {
+                        const result = this.storage.deleteCategory(id);
+                        console.log('删除分类结果:', result);
+                        if (result) {
+                            this.renderCategoryManageList();
+                            this.renderCategories();
+                            this.renderCategoryTabs();
+                            this.renderItems();
+                            this.initCustomSelects();
+                            this.showToast('分类删除成功！', 'success');
+                        } else {
+                            this.showToast('分类删除失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 在弹窗中添加购买渠道
+            addChannelInModal() {
+                console.log('addChannelInModal被调用');
+                this.prompt('添加购买渠道', '请输入购买渠道名称:', '', (confirmed, channelName) => {
+                    if (confirmed) {
+                        const trimmedName = channelName?.trim();
+                        if (!trimmedName) {
+                            this.showToast('请输入购买渠道名称！', 'error');
+                            return;
+                        }
+
+                        const result = this.storage.addChannel({ name: trimmedName });
+                        console.log('添加购买渠道结果:', result);
+                        if (result) {
+                            this.renderChannelManageList();
+                            this.renderChannels();
+                            this.initChannelSelects();
+                            this.showToast('购买渠道添加成功！', 'success');
+                        } else {
+                            this.showToast('购买渠道添加失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 在弹窗中编辑购买渠道
+            editChannelInModal(id) {
+                console.log('编辑购买渠道:', id);
+                const channel = this.storage.getChannelById(id);
+                if (!channel) {
+                    console.error('购买渠道不存在:', id);
+                    this.showToast('购买渠道不存在！', 'error');
+                    return;
+                }
+
+                this.prompt('编辑购买渠道', '请输入新的购买渠道名称:', channel.name, (confirmed, channelName) => {
+                    if (confirmed) {
+                        const trimmedName = channelName?.trim();
+                        if (!trimmedName) {
+                            this.showToast('请输入购买渠道名称！', 'error');
+                            return;
+                        }
+
+                        const result = this.storage.updateChannel(id, { name: trimmedName });
+                        console.log('编辑购买渠道结果:', result);
+                        if (result) {
+                            this.renderChannelManageList();
+                            this.renderChannels();
+                            this.initChannelSelects();
+                            this.showToast('购买渠道编辑成功！', 'success');
+                        } else {
+                            this.showToast('购买渠道编辑失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 在弹窗中删除购买渠道
+            deleteChannelInModal(id) {
+                console.log('删除购买渠道:', id);
+                this.confirm('删除购买渠道', '确定要删除这个购买渠道吗？', (confirmed) => {
+                    if (confirmed) {
+                        const result = this.storage.deleteChannel(id);
+                        console.log('删除购买渠道结果:', result);
+                        if (result) {
+                            this.renderChannelManageList();
+                            this.renderChannels();
+                            this.initChannelSelects();
+                            this.showToast('购买渠道删除成功！', 'success');
+                        } else {
+                            this.showToast('购买渠道删除失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 添加购买渠道
+            addChannel() {
+                console.log('addChannel被调用');
+                this.prompt('添加购买渠道', '请输入购买渠道名称:', '', (confirmed, channelName) => {
+                    if (confirmed) {
+                        const trimmedName = channelName?.trim();
+                        if (!trimmedName) {
+                            this.showToast('请输入购买渠道名称！', 'error');
+                            return;
+                        }
+
+                        const result = this.storage.addChannel({ name: trimmedName });
+                        console.log('添加购买渠道结果:', result);
+                        if (result) {
+                            this.renderChannels();
+                            this.initChannelSelects();
+                            this.showToast('购买渠道添加成功！', 'success');
+                        } else {
+                            this.showToast('购买渠道添加失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 编辑购买渠道
+            editChannel(id) {
+                console.log('编辑购买渠道:', id);
+                const channel = this.storage.getChannelById(id);
+                if (!channel) {
+                    console.error('购买渠道不存在:', id);
+                    this.showToast('购买渠道不存在！', 'error');
+                    return;
+                }
+
+                this.prompt('编辑购买渠道', '请输入新的购买渠道名称:', channel.name, (confirmed, channelName) => {
+                    if (confirmed) {
+                        const trimmedName = channelName?.trim();
+                        if (!trimmedName) {
+                            this.showToast('请输入购买渠道名称！', 'error');
+                            return;
+                        }
+
+                        const result = this.storage.updateChannel(id, { name: trimmedName });
+                        console.log('编辑购买渠道结果:', result);
+                        if (result) {
+                            this.renderChannels();
+                            this.initChannelSelects();
+                            this.showToast('购买渠道编辑成功！', 'success');
+                        } else {
+                            this.showToast('购买渠道编辑失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 删除购买渠道
+            deleteChannel(id) {
+                console.log('删除购买渠道:', id);
+                this.confirm('删除购买渠道', '确定要删除这个购买渠道吗？', (confirmed) => {
+                    if (confirmed) {
+                        const result = this.storage.deleteChannel(id);
+                        console.log('删除购买渠道结果:', result);
+                        if (result) {
+                            this.renderChannels();
+                            this.initChannelSelects();
+                            this.showToast('购买渠道删除成功！', 'success');
+                        } else {
+                            this.showToast('购买渠道删除失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
             // 初始化自定义下拉框
             initCustomSelects() {
                 console.log('初始化自定义下拉框');
-                
+
                 // 从storage中获取所有分类
                 const categories = this.storage.getCategories();
                 console.log('获取到分类数量:', categories.length);
-                
+
                 // 为所有自定义下拉框添加事件监听器
                 const customSelects = document.querySelectorAll('.custom-select');
                 console.log('找到自定义下拉框数量:', customSelects.length);
-                
+
                 customSelects.forEach(select => {
                     const trigger = select.querySelector('.custom-select-trigger');
                     const optionsContainer = select.querySelector('.custom-select-options');
                     const hiddenInput = select.querySelector('input[type="hidden"]');
-                    
+
                     if (trigger && optionsContainer && hiddenInput) {
                         // 清空现有选项
                         optionsContainer.innerHTML = '';
-                        
-                        // 动态生成分类选项
-                        categories.forEach(category => {
-                            const option = document.createElement('div');
-                            option.className = 'custom-select-option';
-                            option.dataset.value = category.name;
-                            option.textContent = `${category.icon} ${category.name}`;
-                            optionsContainer.appendChild(option);
-                        });
+
+                        // 判断是分类下拉框还是状态下拉框
+                        if (select.id.includes('status')) {
+                            // 状态下拉框选项
+                            const statusOptions = [
+                                { value: 'in_use', label: '使用中' },
+                                { value: 'retired', label: '已退役' },
+                                { value: 'lost', label: '已遗失' },
+                                { value: 'gifted', label: '已送人' },
+                                { value: 'donated', label: '已捐赠' },
+                                { value: 'damaged', label: '已损坏' }
+                            ];
+
+                            statusOptions.forEach(status => {
+                                const option = document.createElement('div');
+                                option.className = 'custom-select-option';
+                                option.dataset.value = status.value;
+                                option.textContent = status.label;
+                                optionsContainer.appendChild(option);
+                            });
+                        } else {
+                            // 分类下拉框选项
+                            categories.forEach(category => {
+                                const option = document.createElement('div');
+                                option.className = 'custom-select-option';
+                                option.dataset.value = category.name;
+                                option.textContent = `${category.icon} ${category.name}`;
+                                optionsContainer.appendChild(option);
+                            });
+                        }
                         
                         // 获取新生成的选项
                         const optionItems = select.querySelectorAll('.custom-select-option');
@@ -3744,7 +4428,7 @@
                                 e.stopPropagation();
                                 const value = option.dataset.value;
                                 const text = option.textContent;
-                                
+
                                 // 更新触发框文本
                                 trigger.textContent = text;
                                 // 更新隐藏输入框值
@@ -3754,6 +4438,14 @@
                                 option.classList.add('selected');
                                 // 关闭选项列表
                                 select.classList.remove('open');
+
+                                // 如果是状态下拉框，显示/隐藏退役选项
+                                if (select.id.includes('status')) {
+                                    const retiredOptions = document.getElementById('retired-options');
+                                    if (retiredOptions) {
+                                        retiredOptions.style.display = value === 'retired' ? 'block' : 'none';
+                                    }
+                                }
                             };
                         });
                     }
@@ -3813,9 +4505,10 @@
                             panel.classList.add('active');
                             console.log('显示面板:', tabId);
                             
-                            // 如果切换到我的标签，重新渲染分类列表并更新统计
+                            // 如果切换到我的标签，重新渲染分类列表、购买渠道列表并更新统计
                             if (tabId === 'settings') {
                                 this.renderCategories();
+                                this.renderChannels();
                                 this.updateStats();
                             }
                             
@@ -3826,41 +4519,6 @@
                         }
                     });
                 });
-
-                // 绑定购买渠道选择框事件（添加物品模态框）
-                const addPurchaseChannelInput = document.getElementById('item-purchase-channel');
-                const addCustomChannelGroup = document.getElementById('custom-channel-group');
-                if (addPurchaseChannelInput && addCustomChannelGroup) {
-                    addPurchaseChannelInput.addEventListener('change', function() {
-                        if (this.value === '其他') {
-                            addCustomChannelGroup.style.display = 'block';
-                        } else {
-                            addCustomChannelGroup.style.display = 'none';
-                        }
-                    });
-                }
-
-                // 绑定详情模态框的购买渠道选择框事件
-                const detailPurchaseChannelInput = document.getElementById('detail-item-purchase-channel');
-                const detailCustomChannelGroup = document.getElementById('detail-custom-channel-group');
-                if (detailPurchaseChannelInput && detailCustomChannelGroup) {
-                    detailPurchaseChannelInput.addEventListener('change', function() {
-                        if (this.value === '其他') {
-                            detailCustomChannelGroup.style.display = 'block';
-                        } else {
-                            detailCustomChannelGroup.style.display = 'none';
-                        }
-                    });
-                }
-
-                // 绑定状态下拉框事件
-                const statusSelect = document.getElementById('detail-item-status');
-                const retiredOptions = document.getElementById('retired-options');
-                if (statusSelect && retiredOptions) {
-                    statusSelect.addEventListener('change', function() {
-                        retiredOptions.style.display = this.value === 'retired' ? 'block' : 'none';
-                    });
-                }
 
                 // 绑定二手出售复选框事件
                 const soldCheckbox = document.getElementById('detail-item-sold-secondhand');
@@ -3889,31 +4547,9 @@
                                 purchaseDateInput.value = new Date().toISOString().split('T')[0];
                             }
 
-                            // 设置购买渠道默认值为"其他"
-                            const purchaseChannelInput = document.getElementById('item-purchase-channel');
-                            const customChannelGroup = document.getElementById('custom-channel-group');
-                            const customChannelInput = document.getElementById('item-custom-channel');
-                            if (purchaseChannelInput) {
-                                purchaseChannelInput.value = '其他';
-                            }
-                            if (customChannelGroup) {
-                                customChannelGroup.style.display = 'block';
-                            }
-                            if (customChannelInput) {
-                                customChannelInput.value = '';
-                            }
+                            // 初始化购买渠道选择框
+                            this.initChannelSelects();
 
-                            // 绑定购买渠道选择框事件（purchaseChannelInput已在上面声明）
-                            if (purchaseChannelInput && customChannelGroup) {
-                                purchaseChannelInput.addEventListener('change', function() {
-                                    if (this.value === '其他') {
-                                        customChannelGroup.style.display = 'block';
-                                    } else {
-                                        customChannelGroup.style.display = 'none';
-                                    }
-                                });
-                            }
-                            
                             // 保存this的引用
                             const self = this;
                             // 显示模态框后初始化下拉框
@@ -3946,7 +4582,6 @@
                         const priceInput = document.getElementById('item-price');
                         const purchaseDateInput = document.getElementById('item-purchase-date');
                         const purchaseChannelInput = document.getElementById('item-purchase-channel');
-                        const customChannelInput = document.getElementById('item-custom-channel');
 
                         const name = nameInput?.value?.trim();
                         const category = categoryInput?.value;
@@ -3955,12 +4590,7 @@
                         const priceValue = priceInput?.value?.trim();
                         const price = parseFloat(priceValue) || 0;
                         const purchaseDate = purchaseDateInput?.value || new Date().toISOString().split('T')[0];
-
-                        // 处理购买渠道
-                        let purchaseChannel = purchaseChannelInput?.value || '';
-                        if (purchaseChannel === '其他') {
-                            purchaseChannel = customChannelInput?.value?.trim() || '其他';
-                        }
+                        const purchaseChannel = purchaseChannelInput?.value || '';
 
                         // 清除之前的错误
                         this.clearInputError(nameInput);
@@ -4024,10 +4654,7 @@
                             if (locationInput) locationInput.value = '';
                             if (priceInput) priceInput.value = '';
                             if (purchaseDateInput) purchaseDateInput.value = new Date().toISOString().split('T')[0];
-                            if (purchaseChannelInput) purchaseChannelInput.value = '其他';
-                            if (customChannelInput) customChannelInput.value = '';
-                            const customChannelGroup = document.getElementById('custom-channel-group');
-                            if (customChannelGroup) customChannelGroup.style.display = 'block';
+                            if (purchaseChannelInput) purchaseChannelInput.value = '';
 
                             this.showToast('物品添加成功！', 'success');
                         } else {
@@ -4062,30 +4689,56 @@
                         this.deleteItem();
                     });
                 }
-                
 
-                
-                // 添加分类按钮
-                console.log('开始绑定添加分类按钮事件');
-                const addCategoryBtn = document.getElementById('add-category-btn');
-                console.log('找到添加分类按钮:', !!addCategoryBtn);
-                if (addCategoryBtn) {
-                    console.log('绑定添加分类按钮事件');
-                    addCategoryBtn.addEventListener('click', function() {
-                        console.log('添加分类按钮被点击');
-                        console.log('this指向:', this);
-                        console.log('this.addCategory存在:', typeof this.addCategory === 'function');
-                        if (typeof this.addCategory === 'function') {
-                            console.log('调用this.addCategory');
-                            this.addCategory();
-                        } else {
-                            console.error('this.addCategory不存在');
-                        }
-                    }.bind(this));
-                } else {
-                    console.error('添加分类按钮不存在');
+                // 快捷管理卡片点击事件
+                console.log('开始绑定快捷管理卡片点击事件');
+                const categoryManageCard = document.getElementById('category-manage-card');
+                const channelManageCard = document.getElementById('channel-manage-card');
+
+                if (categoryManageCard) {
+                    categoryManageCard.addEventListener('click', () => {
+                        this.openCategoryManageModal();
+                    });
                 }
-                
+
+                if (channelManageCard) {
+                    channelManageCard.addEventListener('click', () => {
+                        this.openChannelManageModal();
+                    });
+                }
+
+                // 分类管理弹窗事件
+                const closeCategoryModalBtn = document.getElementById('close-category-modal');
+                const addCategoryInModalBtn = document.getElementById('add-category-in-modal');
+
+                if (closeCategoryModalBtn) {
+                    closeCategoryModalBtn.addEventListener('click', () => {
+                        this.closeCategoryManageModal();
+                    });
+                }
+
+                if (addCategoryInModalBtn) {
+                    addCategoryInModalBtn.addEventListener('click', () => {
+                        this.addCategoryInModal();
+                    });
+                }
+
+                // 购买渠道管理弹窗事件
+                const closeChannelModalBtn = document.getElementById('close-channel-modal');
+                const addChannelInModalBtn = document.getElementById('add-channel-in-modal');
+
+                if (closeChannelModalBtn) {
+                    closeChannelModalBtn.addEventListener('click', () => {
+                        this.closeChannelManageModal();
+                    });
+                }
+
+                if (addChannelInModalBtn) {
+                    addChannelInModalBtn.addEventListener('click', () => {
+                        this.addChannelInModal();
+                    });
+                }
+
                 // 导出数据
                 const exportBtn = document.getElementById('export-data-btn');
                 if (exportBtn) {
@@ -4205,32 +4858,19 @@
 
                     // 设置购买渠道
                     const detailPurchaseChannel = document.getElementById('detail-item-purchase-channel');
-                    const detailCustomChannel = document.getElementById('detail-item-custom-channel');
-                    const detailCustomChannelGroup = document.getElementById('detail-custom-channel-group');
-
                     if (detailPurchaseChannel) {
-                        // 预设渠道列表
-                        const presetChannels = ['淘宝', '京东', '抖音', '拼多多'];
-                        const purchaseChannel = item.purchaseChannel || '';
-
-                        if (presetChannels.includes(purchaseChannel)) {
-                            detailPurchaseChannel.value = purchaseChannel;
-                            if (detailCustomChannelGroup) detailCustomChannelGroup.style.display = 'none';
-                        } else {
-                            detailPurchaseChannel.value = purchaseChannel ? '其他' : '';
-                            if (detailCustomChannel) detailCustomChannel.value = purchaseChannel || '';
-                            if (detailCustomChannelGroup) detailCustomChannelGroup.style.display = purchaseChannel && !presetChannels.includes(purchaseChannel) ? 'block' : 'none';
-                        }
+                        detailPurchaseChannel.value = item.purchaseChannel || '';
                     }
 
                     // 设置状态
+                    const customStatusSelect = document.getElementById('custom-detail-status-select');
                     const statusSelect = document.getElementById('detail-item-status');
                     const retiredOptions = document.getElementById('retired-options');
                     const soldCheckbox = document.getElementById('detail-item-sold-secondhand');
                     const soldPriceGroup = document.getElementById('sold-price-group');
                     const soldPriceInput = document.getElementById('detail-item-sold-price');
 
-                    if (statusSelect) {
+                    if (customStatusSelect && statusSelect) {
                         // 兼容旧数据：isRetired 字段
                         let statusValue = item.status || 'in_use';
                         if (item.isRetired === true && !item.status) {
@@ -4238,7 +4878,37 @@
                         } else if (item.isRetired === false && !item.status) {
                             statusValue = 'in_use';
                         }
+
+                        // 设置隐藏输入框的值
                         statusSelect.value = statusValue;
+
+                        // 设置自定义下拉框的显示文本和选中状态
+                        const statusTrigger = customStatusSelect.querySelector('.custom-select-trigger');
+                        const statusOptions = customStatusSelect.querySelectorAll('.custom-select-option');
+
+                        // 状态文本映射
+                        const statusLabels = {
+                            'in_use': '使用中',
+                            'retired': '已退役',
+                            'lost': '已遗失',
+                            'gifted': '已送人',
+                            'donated': '已捐赠',
+                            'damaged': '已损坏'
+                        };
+
+                        if (statusTrigger) {
+                            statusTrigger.textContent = statusLabels[statusValue] || '请选择状态';
+                        }
+
+                        // 标记选中状态
+                        statusOptions.forEach(option => {
+                            if (option.dataset.value === statusValue) {
+                                option.classList.add('selected');
+                            } else {
+                                option.classList.remove('selected');
+                            }
+                        });
+
                         if (retiredOptions) retiredOptions.style.display = statusValue === 'retired' ? 'block' : 'none';
                     }
                     if (soldCheckbox) {
@@ -4266,7 +4936,6 @@
                 const detailItemPrice = document.getElementById('detail-item-price');
                 const detailItemPurchaseDate = document.getElementById('detail-item-purchase-date');
                 const detailPurchaseChannel = document.getElementById('detail-item-purchase-channel');
-                const detailCustomChannel = document.getElementById('detail-item-custom-channel');
                 const statusSelect = document.getElementById('detail-item-status');
                 const soldCheckbox = document.getElementById('detail-item-sold-secondhand');
                 const soldPriceInput = document.getElementById('detail-item-sold-price');
@@ -4275,12 +4944,7 @@
                 const category = detailItemCategory ? detailItemCategory.value : '';
                 const priceValue = detailItemPrice ? detailItemPrice.value?.trim() : '';
                 const price = parseFloat(priceValue) || 0;
-
-                // 处理购买渠道
-                let purchaseChannel = detailPurchaseChannel ? detailPurchaseChannel.value : '';
-                if (purchaseChannel === '其他') {
-                    purchaseChannel = detailCustomChannel ? detailCustomChannel.value?.trim() || '其他' : '其他';
-                }
+                const purchaseChannel = detailPurchaseChannel ? detailPurchaseChannel.value : '';
 
                 // 处理状态
                 const status = statusSelect ? statusSelect.value : 'in_use';
@@ -4511,7 +5175,9 @@
                 console.log('设置模态框点击外部关闭');
                 const modals = [
                     { id: 'add-item-modal', formSelector: '#add-item-modal form', inputs: ['#item-name', '#item-desc', '#item-location', '#item-price'] },
-                    { id: 'item-detail-modal', formSelector: '#item-detail-modal form', inputs: ['#detail-item-name', '#detail-item-desc', '#detail-item-location', '#detail-item-price'] }
+                    { id: 'item-detail-modal', formSelector: '#item-detail-modal form', inputs: ['#detail-item-name', '#detail-item-desc', '#detail-item-location', '#detail-item-price'] },
+                    { id: 'category-manage-modal', formSelector: null, inputs: [] },
+                    { id: 'channel-manage-modal', formSelector: null, inputs: [] }
                 ];
                 
                 modals.forEach(modalConfig => {
@@ -5118,6 +5784,8 @@
                                 alert('数据导入成功！');
                                 this.renderItems();
                                 this.renderCategories();
+                                this.renderChannels();
+                                this.initChannelSelects();
                                 this.renderCategoryTabs();
                                 this.updateStats();
                             } else {
