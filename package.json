@@ -1,0 +1,19 @@
+{
+  "name": "wucanglu",
+  "version": "1.0.0",
+  "description": "物藏录 - 个人物品管理工具",
+  "main": "index.html",
+  "scripts": {
+    "dev": "echo '开发模式：直接在uTools中加载插件目录'",
+    "build": "echo '构建：在uTools开发者工具中打包插件'"
+  },
+  "keywords": [
+    "utools",
+    "plugin",
+    "物品管理",
+    "资产管理",
+    "个人管理"
+  ],
+  "author": "物藏录开发团队",
+  "license": "MIT"
+}

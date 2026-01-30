@@ -1,0 +1,30 @@
+{
+  "pluginName": "物藏录",
+  "description": "个人物品管理工具，记录物品信息、分类管理、数据分析，帮助你更好地管理个人资产",
+  "author": "物藏录开发团队",
+  "homepage": "",
+  "version": "1.0.0",
+  "logo": "logo.png",
+  "platform": ["win32", "darwin", "linux"],
+  "main": "index.html",
+  "preload": "preload.js",
+  "pluginSetting": {
+    "single": true,
+    "height": 700,
+    "width": 1000,
+    "resizable": true
+  },
+  "features": [
+    {
+      "code": "wucanglu_main",
+      "explain": "物藏录 - 个人物品管理工具",
+      "icon": "logo.png",
+      "cmds": [
+        "物藏录",
+        "wucanglu",
+        "物品管理",
+        "资产管理"
+      ]
+    }
+  ]
+}

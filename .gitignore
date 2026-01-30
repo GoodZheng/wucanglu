@@ -1,0 +1,33 @@
+# 开发工具
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 依赖目录
+node_modules/
+
+# 构建输出
+dist/
+build/
+*.upx
+
+# 临时文件
+tmp/
+temp/
+.tmp/
+
+# 调试文件
+debug-info.txt
