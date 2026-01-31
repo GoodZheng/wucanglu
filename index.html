@@ -1717,7 +1717,39 @@
                     <button class="category-tab active" data-category="all">全部</button>
                     <!-- 分类标签将通过JavaScript动态生成 -->
                 </div>
-                
+
+                <!-- 快速统计卡片 -->
+                <div class="item-stats-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📦</div>
+                        <div class="stats-content">
+                            <div class="stats-label">物品总数</div>
+                            <div class="stats-value" id="item-total-count">0</div>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">📅</div>
+                        <div class="stats-content">
+                            <div class="stats-label">本月新增</div>
+                            <div class="stats-value" id="item-monthly-new">0</div>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">📆</div>
+                        <div class="stats-content">
+                            <div class="stats-label">年度新增</div>
+                            <div class="stats-value" id="item-yearly-new">0</div>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💰</div>
+                        <div class="stats-content">
+                            <div class="stats-label">总价值</div>
+                            <div class="stats-value" id="item-total-value">¥0</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="item-list" id="item-list">
                     <!-- 物品卡片将通过JavaScript动态生成 -->
                 </div>
@@ -4581,6 +4613,8 @@
                 this.renderCategoryTabs();
                 console.log('渲染物品列表');
                 this.renderItems();
+                console.log('更新物品统计信息');
+                this.updateItemStats();
                 console.log('渲染分类列表');
                 this.renderCategories();
                 console.log('渲染购买渠道列表');
@@ -5873,7 +5907,41 @@
                     this.renderItems();
                 });
             }
-            
+
+            // 更新物品快速统计
+            updateItemStats() {
+                const items = this.storage.getItems();
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth(); // 0-11
+
+                // 物品总数
+                const totalCount = items.length;
+
+                // 本月新增
+                const monthlyNew = items.filter(item => {
+                    if (!item.createdAt) return false;
+                    const createdDate = new Date(item.createdAt);
+                    return createdDate.getFullYear() === currentYear && createdDate.getMonth() === currentMonth;
+                }).length;
+
+                // 年度新增
+                const yearlyNew = items.filter(item => {
+                    if (!item.createdAt) return false;
+                    const createdDate = new Date(item.createdAt);
+                    return createdDate.getFullYear() === currentYear;
+                }).length;
+
+                // 总价值
+                const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0);
+
+                // 更新DOM
+                document.getElementById('item-total-count').textContent = totalCount;
+                document.getElementById('item-monthly-new').textContent = monthlyNew;
+                document.getElementById('item-yearly-new').textContent = yearlyNew;
+                document.getElementById('item-total-value').textContent = `¥${totalValue.toFixed(0)}`;
+            }
+
             // 渲染物品列表
             renderItems(category = 'all') {
                 const itemList = document.getElementById('item-list');
@@ -7056,7 +7124,8 @@
                         if (result) {
                             // 更新统计信息
                             this.updateStats();
-                            
+                            this.updateItemStats();
+
                             // 重新渲染物品列表，显示新添加的物品
                             // 保持当前的分类筛选状态
                             const activeTab = document.querySelector('.category-tab.active');
@@ -7352,7 +7421,8 @@
                 if (result) {
                     // 更新统计信息
                     this.updateStats();
-                    
+                    this.updateItemStats();
+
                     // 重新渲染物品列表，保持当前分类筛选状态
                     const activeTab = document.querySelector('.category-tab.active');
                     const currentCategory = activeTab ? activeTab.dataset.category : 'all';
@@ -7393,10 +7463,11 @@
                         
                         if (result) {
                             console.log('删除成功，准备显示提示');
-                            
+
                             // 更新统计信息
                             this.updateStats();
-                            
+                            this.updateItemStats();
+
                             // 重新渲染物品列表，保持当前分类筛选状态
                             const activeTab = document.querySelector('.category-tab.active');
                             const currentCategory = activeTab ? activeTab.dataset.category : 'all';
