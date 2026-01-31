@@ -1543,8 +1543,11 @@
             font-size: 13px;
             color: var(--text-secondary);
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        
+
         .stats-value {
             font-size: 24px;
             font-weight: 700;
@@ -1849,14 +1852,30 @@
             <button id="add-subscription-btn" class="add-subscription-btn">+</button>
 
             <div class="panel" id="analytics-panel">
-                <!-- 概览卡片 -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                    <div class="stats-card">
-                        <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📦</div>
-                        <div class="stats-content">
-                            <div class="stats-label">物品总数</div>
-                            <div class="stats-value" id="analytics-total-items">0</div>
-                        </div>
+                <!-- 分析类型切换器 -->
+                <div style="margin-bottom: 24px; display: flex; justify-content: center;">
+                    <div class="analytics-type-switcher">
+                        <button class="analytics-type-btn active" data-type="items">
+                            <span class="btn-icon">📦</span>
+                            <span class="btn-text">物品分析</span>
+                        </button>
+                        <button class="analytics-type-btn" data-type="subscription">
+                            <span class="btn-icon">💳</span>
+                            <span class="btn-text">订阅分析</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 物品分析内容 -->
+                <div id="analytics-items-content">
+                    <!-- 概览卡片 -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📦</div>
+                            <div class="stats-content">
+                                <div class="stats-label">物品总数</div>
+                                <div class="stats-value" id="analytics-total-items">0</div>
+                            </div>
                     </div>
                     <div class="stats-card">
                         <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💰</div>
@@ -1986,8 +2005,125 @@
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <!-- 订阅分析内容 -->
+                <div id="analytics-subscription-content" style="display: none;">
+                    <!-- 概览卡片 -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">💳</div>
+                            <div class="stats-content">
+                                <div class="stats-label">订阅总数</div>
+                                <div class="stats-value" id="sub-analytics-total">0</div>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💰</div>
+                            <div class="stats-content">
+                                <div class="stats-label">
+                                    <span class="daily-cost-tooltip">
+                                        月度支出
+                                        <span class="tooltip-icon">?</span>
+                                        <span class="tooltip-content">按天：单价×30 | 按周：单价×4.33 | 按月：单价 | 按季：单价÷3 | 按年：单价÷12</span>
+                                    </span>
+                                </div>
+                                <div class="stats-value" id="sub-analytics-monthly">¥0</div>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">📊</div>
+                            <div class="stats-content">
+                                <div class="stats-label">
+                                    <span class="daily-cost-tooltip">
+                                        年度支出
+                                        <span class="tooltip-icon">?</span>
+                                        <span class="tooltip-content">按天：单价×365 | 按周：单价×52 | 按月：单价×12 | 按季：单价×4 | 按年：单价</span>
+                                    </span>
+                                </div>
+                                <div class="stats-value" id="sub-analytics-yearly">¥0</div>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">📅</div>
+                            <div class="stats-content">
+                                <div class="stats-label">即将到期</div>
+                                <div class="stats-value" id="sub-analytics-expiring">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图表区域 -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                        <!-- 分类分布饼图 -->
+                        <div class="chart-container">
+                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">📊 分类分布</h4>
+                            <canvas id="sub-category-chart"></canvas>
+                        </div>
+
+                        <!-- 计费周期分布 -->
+                        <div class="chart-container">
+                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">🔄 计费周期分布</h4>
+                            <canvas id="sub-cycle-chart"></canvas>
+                        </div>
+
+                        <!-- 费用区间分布 -->
+                        <div class="chart-container">
+                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">💵 费用区间分布</h4>
+                            <canvas id="sub-price-chart"></canvas>
+                        </div>
+
+                        <!-- 月度支出趋势 -->
+                        <div class="chart-container">
+                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">📈 订阅时间趋势</h4>
+                            <canvas id="sub-timeline-chart"></canvas>
+                        </div>
+
+                        <!-- 分类支出对比 -->
+                        <div class="chart-container">
+                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">💎 分类月度支出对比</h4>
+                            <canvas id="sub-category-value-chart"></canvas>
+                        </div>
+
+                        <!-- 状态分布 -->
+                        <div class="chart-container">
+                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">📋 状态分布</h4>
+                            <canvas id="sub-status-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- TOP榜单 -->
+                    <div style="margin-top: 24px;">
+                        <h4 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">🏅 TOP榜单</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                            <!-- 最贵订阅TOP5 -->
+                            <div class="chart-container">
+                                <h5 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--primary-color);">💰 最贵订阅 TOP5</h5>
+                                <div id="sub-top-expensive-list"></div>
+                            </div>
+
+                            <!-- 即将到期TOP5 -->
+                            <div class="chart-container">
+                                <h5 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--primary-color);">📅 即将到期 TOP5</h5>
+                                <div id="sub-top-expiring-list"></div>
+                            </div>
+
+                            <!-- 持有最久TOP5 -->
+                            <div class="chart-container">
+                                <h5 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--primary-color);">🕰️ 持有最久 TOP5</h5>
+                                <div id="sub-top-oldest-list"></div>
+                            </div>
+
+                            <!-- 年度支出最高TOP5 -->
+                            <div class="chart-container">
+                                <h5 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--primary-color);">💸 年度支出最高 TOP5</h5>
+                                <div id="sub-top-yearly-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
+
             <div class="panel" id="settings-panel">
                 <!-- 统计概览 -->
                 <div class="settings-section" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none;">
@@ -2004,8 +2140,8 @@
                             <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">元</div>
                         </div>
                         <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 8px; backdrop-filter: blur(10px);">
-                            <div style="font-size: 11px; opacity: 0.9; margin-bottom: 4px;">分类数量</div>
-                            <div style="font-size: 24px; font-weight: 700;" id="stats-total-categories">0</div>
+                            <div style="font-size: 11px; opacity: 0.9; margin-bottom: 4px;">订阅数量</div>
+                            <div style="font-size: 24px; font-weight: 700;" id="stats-total-subscriptions">0</div>
                             <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">个</div>
                         </div>
                         <div style="text-align: center; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 8px; backdrop-filter: blur(10px);">
@@ -3631,9 +3767,10 @@
         // 订阅UI管理类
         // ============================================================
         class SubscriptionUI {
-            constructor(storage, manager) {
+            constructor(storage, manager, app) {
                 this.storage = storage;
                 this.manager = manager;
+                this.app = app;
                 this.currentEditingSubscription = null;
                 this.currentCalendarDate = new Date();
                 this.charts = {};
@@ -4007,7 +4144,7 @@
 
             // 打开编辑订阅对话框
             openEditSubscriptionDialog(id) {
-                const sub = this.subscriptionStorage.getSubscriptionById(id);
+                const sub = this.storage.getSubscriptionById(id);
                 if (!sub) return;
 
                 this.currentEditingSubscription = sub;
@@ -4057,7 +4194,7 @@
                 const select = document.getElementById('subscription-category');
                 if (!select) return;
 
-                const categories = this.subscriptionStorage.getSubscriptionCategories();
+                const categories = this.storage.getSubscriptionCategories();
                 select.innerHTML = categories.map(cat =>
                     `<option value="${cat.name}">${cat.icon} ${cat.name}</option>`
                 ).join('');
@@ -4146,9 +4283,9 @@
                 if (result) {
                     this.closeSubscriptionDialog();
                     this.renderSubscriptionPanel();
-                    alert(this.currentEditingSubscription ? '订阅更新成功！' : '订阅添加成功！');
+                    this.app.showToast(this.currentEditingSubscription ? '订阅更新成功！' : '订阅添加成功！', 'success');
                 } else {
-                    alert('操作失败，请重试！');
+                    this.app.showToast('操作失败，请重试！', 'error');
                 }
             }
 
@@ -4158,9 +4295,9 @@
                     const result = this.storage.deleteSubscription(id);
                     if (result) {
                         this.renderSubscriptionPanel();
-                        alert('订阅删除成功！');
+                        this.app.showToast('订阅删除成功！', 'success');
                     } else {
-                        alert('删除失败，请重试！');
+                        this.app.showToast('删除失败，请重试！', 'error');
                     }
                 }
             }
@@ -4456,7 +4593,7 @@
                 this.storage = new Storage();
                 this.subscriptionStorage = new SubscriptionStorage();
                 this.subscriptionManager = new SubscriptionManager(this.subscriptionStorage);
-                this.subscriptionUI = new SubscriptionUI(this.subscriptionStorage, this.subscriptionManager);
+                this.subscriptionUI = new SubscriptionUI(this.subscriptionStorage, this.subscriptionManager, this);
                 this.currentEditingItem = null;
                 this.dialogCallback = null;
                 this.currentDraggedItemId = null; // 当前拖拽的物品ID
@@ -4467,7 +4604,8 @@
                 this.currentLayout = 'grid'; // 当前布局模式
                 this.currentTheme = null; // 当前主题
                 this.charts = {}; // 存储图表实例
-                
+                this.currentAnalyticsType = 'items'; // 当前分析类型: items 或 subscription
+
                 // 预设主题
                 this.themePresets = {
                     default: {
@@ -4643,9 +4781,45 @@
             
             // 渲染数据分析
             renderAnalytics() {
+                // 根据当前分析类型渲染对应内容
+                if (this.currentAnalyticsType === 'subscription') {
+                    this.renderSubscriptionAnalytics();
+                } else {
+                    this.renderItemsAnalytics();
+                }
+            }
+
+            // 切换分析类型
+            switchAnalyticsType(type) {
+                this.currentAnalyticsType = type;
+
+                // 更新切换按钮状态
+                document.querySelectorAll('.analytics-type-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.type === type);
+                });
+
+                // 显示/隐藏对应内容
+                const itemsContent = document.getElementById('analytics-items-content');
+                const subContent = document.getElementById('analytics-subscription-content');
+                if (itemsContent && subContent) {
+                    if (type === 'subscription') {
+                        itemsContent.style.display = 'none';
+                        subContent.style.display = 'block';
+                    } else {
+                        itemsContent.style.display = 'block';
+                        subContent.style.display = 'none';
+                    }
+                }
+
+                // 重新渲染分析数据
+                this.renderAnalytics();
+            }
+
+            // 渲染物品分析
+            renderItemsAnalytics() {
                 const items = this.storage.getItems();
                 const categories = this.storage.getCategories();
-                
+
                 // 计算统计数据
                 const totalItems = items.length;
                 const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0);
@@ -5382,7 +5556,564 @@
                     `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">暂无数据</div>';
                 }
             }
-            
+
+            // ============================================================
+            // 订阅分析渲染方法
+            // ============================================================
+
+            // 渲染订阅分析
+            renderSubscriptionAnalytics() {
+                const subscriptions = this.subscriptionStorage.getSubscriptions();
+                const categories = this.subscriptionStorage.getSubscriptionCategories();
+
+                // 只统计活跃状态的订阅
+                const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
+                const totalSubscriptions = activeSubscriptions.length;
+
+                // 计算月度和年度支出
+                let totalMonthly = 0;
+                let totalYearly = 0;
+                activeSubscriptions.forEach(sub => {
+                    const price = sub.price || 0;
+                    const cycleType = sub.cycleType;
+
+                    switch (cycleType) {
+                        case 'day':
+                            // 按天：按30天计算一个月
+                            totalMonthly += price * 30;
+                            totalYearly += price * 365;
+                            break;
+                        case 'week':
+                            // 按周：按4.33周计算一个月
+                            totalMonthly += price * 4.33;
+                            totalYearly += price * 52;
+                            break;
+                        case 'month':
+                            // 按月
+                            totalMonthly += price;
+                            totalYearly += price * 12;
+                            break;
+                        case 'quarter':
+                            // 按季
+                            totalMonthly += price / 3;
+                            totalYearly += price * 4;
+                            break;
+                        case 'year':
+                            // 按年
+                            totalMonthly += price / 12;
+                            totalYearly += price;
+                            break;
+                        case 'lifetime':
+                            // 终身订阅不计入周期支出
+                            break;
+                    }
+                });
+
+                // 计算即将到期的订阅（7天内）
+                const now = new Date();
+                const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                const expiringCount = activeSubscriptions.filter(sub => {
+                    if (sub.nextBillingDate) {
+                        const nextDate = new Date(sub.nextBillingDate);
+                        return nextDate <= sevenDaysLater;
+                    }
+                    return false;
+                }).length;
+
+                // 更新统计卡片
+                const statsElements = {
+                    'sub-analytics-total': totalSubscriptions,
+                    'sub-analytics-monthly': `¥${totalMonthly.toFixed(0)}`,
+                    'sub-analytics-yearly': `¥${totalYearly.toFixed(0)}`,
+                    'sub-analytics-expiring': expiringCount
+                };
+
+                Object.keys(statsElements).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = statsElements[id];
+                });
+
+                // 销毁旧图表
+                if (this.charts) {
+                    Object.values(this.charts).forEach(chart => {
+                        if (chart && typeof chart.destroy === 'function') {
+                            chart.destroy();
+                        }
+                    });
+                }
+                this.charts = {};
+
+                // 渲染所有订阅图表
+                this.renderSubCategoryPieChart(activeSubscriptions, categories);
+                this.renderSubCycleChart(activeSubscriptions);
+                this.renderSubPriceChart(activeSubscriptions);
+                this.renderSubTimelineChart(activeSubscriptions);
+                this.renderSubCategoryValueChart(activeSubscriptions, categories);
+                this.renderSubStatusChart(subscriptions);
+
+                // 渲染TOP榜单
+                this.renderSubTopLists(activeSubscriptions);
+            }
+
+            // 订阅分类分布饼图
+            renderSubCategoryPieChart(subscriptions, categories) {
+                const ctx = document.getElementById('sub-category-chart');
+                if (!ctx) return;
+
+                const categoryCount = {};
+                categories.forEach(cat => {
+                    categoryCount[cat.name] = 0;
+                });
+
+                subscriptions.forEach(sub => {
+                    if (categoryCount.hasOwnProperty(sub.category)) {
+                        categoryCount[sub.category]++;
+                    }
+                });
+
+                const labels = Object.keys(categoryCount);
+                const data = Object.values(categoryCount);
+
+                const colors = [
+                    '#4361ee', '#3f37c9', '#4cc9f0', '#f72585', '#7209b7',
+                    '#560bad', '#b5179e', '#f72585', '#4895ef', '#4cc9f0'
+                ];
+
+                this.charts.subCategoryChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors.slice(0, labels.length),
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                        return `${label}: ${value}个 (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 订阅计费周期分布图
+            renderSubCycleChart(subscriptions) {
+                const ctx = document.getElementById('sub-cycle-chart');
+                if (!ctx) return;
+
+                const cycleCount = { 'monthly': 0, 'quarterly': 0, 'yearly': 0, 'lifetime': 0 };
+                subscriptions.forEach(sub => {
+                    const cycle = sub.cycleType || 'monthly';
+                    if (cycleCount.hasOwnProperty(cycle)) {
+                        cycleCount[cycle]++;
+                    }
+                });
+
+                const labels = { 'monthly': '月付', 'quarterly': '季付', 'yearly': '年付', 'lifetime': '终身' };
+
+                this.charts.subCycleChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(cycleCount).map(k => labels[k]),
+                        datasets: [{
+                            data: Object.values(cycleCount),
+                            backgroundColor: ['#4361ee', '#4cc9f0', '#f72585', '#7209b7'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 订阅费用区间分布
+            renderSubPriceChart(subscriptions) {
+                const ctx = document.getElementById('sub-price-chart');
+                if (!ctx) return;
+
+                const ranges = [
+                    { label: '0-10', min: 0, max: 10 },
+                    { label: '10-50', min: 10, max: 50 },
+                    { label: '50-100', min: 50, max: 100 },
+                    { label: '100-200', min: 100, max: 200 },
+                    { label: '200+', min: 200, max: Infinity }
+                ];
+
+                const counts = ranges.map(range => {
+                    return subscriptions.filter(sub => {
+                        const price = sub.price || 0;
+                        return price >= range.min && price < range.max;
+                    }).length;
+                });
+
+                this.charts.subPriceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ranges.map(r => r.label),
+                        datasets: [{
+                            label: '订阅数量',
+                            data: counts,
+                            backgroundColor: 'rgba(67, 97, 238, 0.8)',
+                            borderColor: 'rgba(67, 97, 238, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        }
+                    }
+                });
+            }
+
+            // 订阅时间趋势图
+            renderSubTimelineChart(subscriptions) {
+                const ctx = document.getElementById('sub-timeline-chart');
+                if (!ctx) return;
+
+                const monthData = {};
+                const now = new Date();
+
+                // 初始化最近12个月的数据
+                for (let i = 11; i >= 0; i--) {
+                    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    monthData[key] = 0;
+                }
+
+                subscriptions.forEach(sub => {
+                    const startDate = sub.startDate || sub.createdAt;
+                    if (startDate) {
+                        const date = new Date(startDate);
+                        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        if (monthData.hasOwnProperty(key)) {
+                            monthData[key]++;
+                        }
+                    }
+                });
+
+                this.charts.subTimelineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Object.keys(monthData).map(k => {
+                            const [y, m] = k.split('-');
+                            return `${m}月`;
+                        }),
+                        datasets: [{
+                            label: '新增订阅',
+                            data: Object.values(monthData),
+                            borderColor: '#4361ee',
+                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        }
+                    }
+                });
+            }
+
+            // 订阅分类月度支出对比
+            renderSubCategoryValueChart(subscriptions, categories) {
+                const ctx = document.getElementById('sub-category-value-chart');
+                if (!ctx) return;
+
+                const categoryMonthly = {};
+                categories.forEach(cat => {
+                    categoryMonthly[cat.name] = 0;
+                });
+
+                subscriptions.forEach(sub => {
+                    if (categoryMonthly.hasOwnProperty(sub.category)) {
+                        const price = sub.price || 0;
+                        const cycleType = sub.cycleType;
+
+                        let monthlyCost = 0;
+                        switch (cycleType) {
+                            case 'day':
+                                monthlyCost = price * 30;
+                                break;
+                            case 'week':
+                                monthlyCost = price * 4.33;
+                                break;
+                            case 'month':
+                                monthlyCost = price;
+                                break;
+                            case 'quarter':
+                                monthlyCost = price / 3;
+                                break;
+                            case 'year':
+                                monthlyCost = price / 12;
+                                break;
+                            case 'lifetime':
+                                monthlyCost = 0;
+                                break;
+                        }
+                        categoryMonthly[sub.category] += monthlyCost;
+                    }
+                });
+
+                const labels = Object.keys(categoryMonthly);
+                const data = Object.values(categoryMonthly);
+
+                this.charts.subCategoryValueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '月度支出',
+                            data: data,
+                            backgroundColor: 'rgba(244, 114, 182, 0.8)',
+                            borderColor: 'rgba(244, 114, 182, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `月支出: ¥${context.parsed.y.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+
+            // 订阅状态分布图
+            renderSubStatusChart(subscriptions) {
+                const ctx = document.getElementById('sub-status-chart');
+                if (!ctx) return;
+
+                const statusCount = { 'active': 0, 'paused': 0, 'cancelled': 0 };
+                subscriptions.forEach(sub => {
+                    const status = sub.status || 'active';
+                    if (statusCount.hasOwnProperty(status)) {
+                        statusCount[status]++;
+                    }
+                });
+
+                const labels = { 'active': '活跃', 'paused': '暂停', 'cancelled': '已取消' };
+
+                this.charts.subStatusChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(statusCount).map(k => labels[k]),
+                        datasets: [{
+                            data: Object.values(statusCount),
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 订阅TOP榜单
+            renderSubTopLists(subscriptions) {
+                // 最贵订阅TOP5（按月费计算）
+                const subsWithMonthly = subscriptions.map(sub => {
+                    const price = sub.price || 0;
+                    const cycleType = sub.cycleType;
+
+                    let monthlyCost = 0;
+                    let yearlyCost = 0;
+                    switch (cycleType) {
+                        case 'day':
+                            monthlyCost = price * 30;
+                            yearlyCost = price * 365;
+                            break;
+                        case 'week':
+                            monthlyCost = price * 4.33;
+                            yearlyCost = price * 52;
+                            break;
+                        case 'month':
+                            monthlyCost = price;
+                            yearlyCost = price * 12;
+                            break;
+                        case 'quarter':
+                            monthlyCost = price / 3;
+                            yearlyCost = price * 4;
+                            break;
+                        case 'year':
+                            monthlyCost = price / 12;
+                            yearlyCost = price;
+                            break;
+                        case 'lifetime':
+                            monthlyCost = 0;
+                            yearlyCost = 0;
+                            break;
+                    }
+
+                    return { ...sub, monthlyCost, yearlyCost };
+                });
+
+                const topExpensive = [...subsWithMonthly]
+                    .sort((a, b) => b.monthlyCost - a.monthlyCost)
+                    .slice(0, 5);
+
+                const expensiveList = document.getElementById('sub-top-expensive-list');
+                if (expensiveList) {
+                    expensiveList.innerHTML = topExpensive.map((sub, index) => `
+                        <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${['#FFD700', '#C0C0C0', '#CD7F32', '#E8E8E8', '#F5F5F5'][index]}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; margin-right: 12px;">${index + 1}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${sub.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">${sub.category}</div>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color);">¥${sub.monthlyCost.toFixed(0)}/月</div>
+                        </div>
+                    `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">暂无数据</div>';
+                }
+
+                // 即将到期TOP5
+                const now = new Date();
+                const subsWithDays = subscriptions.map(sub => {
+                    if (sub.nextBillingDate) {
+                        const nextDate = new Date(sub.nextBillingDate);
+                        const days = Math.ceil((nextDate - now) / (1000 * 60 * 60 * 24));
+                        return { ...sub, daysToExpiry: days };
+                    }
+                    return { ...sub, daysToExpiry: Infinity };
+                }).filter(sub => sub.daysToExpiry !== Infinity && sub.daysToExpiry > 0);
+
+                const topExpiring = [...subsWithDays]
+                    .sort((a, b) => a.daysToExpiry - b.daysToExpiry)
+                    .slice(0, 5);
+
+                const expiringList = document.getElementById('sub-top-expiring-list');
+                if (expiringList) {
+                    expiringList.innerHTML = topExpiring.map((sub, index) => `
+                        <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${['#FFD700', '#C0C0C0', '#CD7F32', '#E8E8E8', '#F5F5F5'][index]}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; margin-right: 12px;">${index + 1}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${sub.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">${sub.category}</div>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 600; color: ${sub.daysToExpiry <= 3 ? 'var(--danger-color)' : 'var(--warning-color)'};">${sub.daysToExpiry}天</div>
+                        </div>
+                    `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">暂无数据</div>';
+                }
+
+                // 持有最久TOP5
+                const subsWithAge = subscriptions.map(sub => {
+                    const startDate = sub.startDate || sub.createdAt;
+                    if (startDate) {
+                        const days = Math.ceil((now - new Date(startDate)) / (1000 * 60 * 60 * 24));
+                        return { ...sub, days };
+                    }
+                    return { ...sub, days: 0 };
+                }).filter(sub => sub.days > 0);
+
+                const topOldest = [...subsWithAge]
+                    .sort((a, b) => b.days - a.days)
+                    .slice(0, 5);
+
+                const oldestList = document.getElementById('sub-top-oldest-list');
+                if (oldestList) {
+                    oldestList.innerHTML = topOldest.map((sub, index) => `
+                        <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${['#FFD700', '#C0C0C0', '#CD7F32', '#E8E8E8', '#F5F5F5'][index]}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; margin-right: 12px;">${index + 1}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${sub.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">${sub.category}</div>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--accent-color);">${sub.days}天</div>
+                        </div>
+                    `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">暂无数据</div>';
+                }
+
+                // 年度支出最高TOP5
+                const topYearly = [...subsWithMonthly]
+                    .sort((a, b) => b.yearlyCost - a.yearlyCost)
+                    .slice(0, 5);
+
+                const yearlyList = document.getElementById('sub-top-yearly-list');
+                if (yearlyList) {
+                    yearlyList.innerHTML = topYearly.map((sub, index) => `
+                        <div style="display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: ${['#FFD700', '#C0C0C0', '#CD7F32', '#E8E8E8', '#F5F5F5'][index]}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; margin-right: 12px;">${index + 1}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${sub.name}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">${sub.category}</div>
+                            </div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--primary-color);">¥${sub.yearlyCost.toFixed(0)}/年</div>
+                        </div>
+                    `).join('') || '<div style="text-align: center; padding: 20px; color: var(--text-light);">暂无数据</div>';
+                }
+            }
+
             // 更新统计信息
             updateStats() {
                 const items = this.storage.getItems();
@@ -5465,22 +6196,23 @@
                 // 更新"我的"页面的统计卡片
                 const statsItemsElement = document.getElementById('stats-total-items');
                 const statsAssetsElement = document.getElementById('stats-total-assets');
-                const statsCategoriesElement = document.getElementById('stats-total-categories');
+                const statsSubscriptionsElement = document.getElementById('stats-total-subscriptions');
                 const statsDailyElement = document.getElementById('stats-daily-average');
-                
+
                 if (statsItemsElement) {
                     statsItemsElement.textContent = totalItems;
                 }
-                
+
                 if (statsAssetsElement) {
                     statsAssetsElement.textContent = `¥${Math.round(totalAssets)}`;
                 }
-                
-                if (statsCategoriesElement) {
-                    const categories = this.storage.getCategories();
-                    statsCategoriesElement.textContent = categories.length;
+
+                if (statsSubscriptionsElement) {
+                    const subscriptions = this.subscriptionStorage.getSubscriptions();
+                    const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
+                    statsSubscriptionsElement.textContent = activeSubscriptions.length;
                 }
-                
+
                 if (statsDailyElement) {
                     statsDailyElement.textContent = `¥${totalDailyCost.toFixed(2)}`;
                 }
@@ -5867,6 +6599,15 @@
                         this.subscriptionManager.checkReminders();
                     });
                 }
+
+                // 分析类型切换器事件绑定
+                const analyticsTypeBtns = document.querySelectorAll('.analytics-type-btn');
+                analyticsTypeBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const type = btn.dataset.type;
+                        this.switchAnalyticsType(type);
+                    });
+                });
             }
 
             // 渲染分类标签
