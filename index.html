@@ -135,6 +135,7 @@
             padding: 16px 24px;
             flex: 1;
             overflow-y: auto;
+            width: 100%;
         }
         
         .panel.active {
@@ -145,11 +146,9 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
             }
         }
         
@@ -264,25 +263,68 @@
         }
 
         /* 根据标签页控制添加按钮显示 */
-        body[data-active-tab="items"] .add-item-btn,
-        body[data-active-tab="analytics"] .add-item-btn,
-        body[data-active-tab="settings"] .add-item-btn {
+        /* 只在物品页面显示添加物品按钮 */
+        body[data-active-tab="items"] .add-item-btn {
             display: flex !important;
         }
 
-        body[data-active-tab="subscription"] .add-item-btn {
-            display: none !important;
-        }
-
+        /* 只在订阅页面显示添加订阅按钮 */
         body[data-active-tab="subscription"] .add-subscription-btn {
             display: flex !important;
         }
-        
+
+        /* 在分析和设置页面隐藏所有添加按钮 */
+        body[data-active-tab="analytics"] .add-item-btn,
+        body[data-active-tab="analytics"] .add-subscription-btn,
+        body[data-active-tab="settings"] .add-item-btn,
+        body[data-active-tab="settings"] .add-subscription-btn {
+            display: none !important;
+        }
+
+        /* 分析类型分段控制器 */
+        .analytics-toggle {
+            display: inline-flex;
+            background: var(--background-tertiary);
+            padding: 4px;
+            border-radius: 14px;
+            gap: 4px;
+        }
+
+        .analytics-toggle-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+
+        .analytics-toggle-option:hover {
+            color: var(--text-primary);
+        }
+
+        .analytics-toggle-option.active {
+            background: var(--background-primary);
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .analytics-toggle-option .toggle-icon {
+            font-size: 16px;
+        }
+
         /* 物品列表 */
         .item-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px;
+            align-items: start;
+            contain: layout;
         }
         
         /* 网格布局（默认） */
@@ -346,10 +388,15 @@
             padding: 12px;
             box-shadow: var(--box-shadow);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .item-card::before {
@@ -378,15 +425,21 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 8px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        
+
         .item-name {
             font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
-            flex: 1;
+            flex: 1 1 auto;
             min-width: 0;
             margin-right: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         .item-days {
@@ -790,6 +843,8 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px;
+            align-items: start;
+            contain: layout;
         }
 
         .subscription-card {
@@ -798,12 +853,17 @@
             padding: 16px;
             box-shadow: var(--box-shadow);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .subscription-card:hover {
@@ -817,7 +877,9 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
-            flex: 1;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
         .subscription-name {
@@ -828,10 +890,21 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 4px;
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subscription-name span:not(.subscription-icon) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .subscription-icon {
             font-size: 24px;
+            flex-shrink: 0;
         }
 
         .subscription-category {
@@ -842,6 +915,8 @@
             display: inline-block;
             padding: 2px 8px;
             border-radius: 8px;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
 
         .subscription-price {
@@ -849,6 +924,11 @@
             font-weight: 600;
             color: var(--text-primary);
             margin: 8px 0;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .subscription-price-unit {
@@ -861,6 +941,11 @@
             font-size: 12px;
             color: var(--text-secondary);
             margin-top: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .subscription-billing.soon {
@@ -1518,6 +1603,16 @@
             transition: var(--transition);
         }
         
+        /* 统计卡片容器 */
+        .item-stats-cards,
+        .subscription-stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            min-height: 96px;
+        }
+        
         .stats-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--box-shadow-hover);
@@ -1552,6 +1647,8 @@
             font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+            min-width: 60px;
         }
         
         /* 图表容器 */
@@ -1852,17 +1949,17 @@
             <button id="add-subscription-btn" class="add-subscription-btn">+</button>
 
             <div class="panel" id="analytics-panel">
-                <!-- 分析类型切换器 -->
+                <!-- 分析类型分段控制器 -->
                 <div style="margin-bottom: 24px; display: flex; justify-content: center;">
-                    <div class="analytics-type-switcher">
-                        <button class="analytics-type-btn active" data-type="items">
-                            <span class="btn-icon">📦</span>
-                            <span class="btn-text">物品分析</span>
-                        </button>
-                        <button class="analytics-type-btn" data-type="subscription">
-                            <span class="btn-icon">💳</span>
-                            <span class="btn-text">订阅分析</span>
-                        </button>
+                    <div class="analytics-toggle">
+                        <div class="analytics-toggle-option active" data-type="items">
+                            <span class="toggle-icon">📦</span>
+                            <span>物品分析</span>
+                        </div>
+                        <div class="analytics-toggle-option" data-type="subscription">
+                            <span class="toggle-icon">💳</span>
+                            <span>订阅分析</span>
+                        </div>
                     </div>
                 </div>
 
@@ -2512,7 +2609,7 @@
     </div>
 
     <!-- 订阅分类管理弹窗 -->
-    <div id="subscription-category-manage-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div id="subscription-category-manage-modal">
         <div style="background-color: white; padding: 28px; border-radius: 16px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
             <h3 style="margin-bottom: 20px; text-align: center; font-size: 18px;">📁 订阅分类管理</h3>
             <div id="subscription-category-manage-list" style="margin-bottom: 20px;">
@@ -2859,14 +2956,44 @@
                 return false;
             }
             
-            // 删除分类
+            // 删除分类（将该分类下的物品转移到"其他"分类）
             deleteCategory(id) {
                 console.log('删除分类:', id);
                 const categories = this.getCategories();
-                console.log('删除前的分类:', categories);
-                // 确保ID比较时类型一致，同时支持数字和字符串
+
+                // 找到"其他"分类
+                const otherCategory = categories.find(c => c.name === '其他');
+                if (!otherCategory) {
+                    console.error('未找到"其他"分类');
+                    return false;
+                }
+
+                // 防止删除"其他"分类本身
+                const categoryToDelete = categories.find(c => c.id == id || c.id.toString() === id.toString());
+                if (!categoryToDelete) {
+                    console.error('分类不存在:', id);
+                    return false;
+                }
+
+                if (categoryToDelete.name === '其他') {
+                    console.error('不能删除"其他"分类');
+                    return false;
+                }
+
+                // 将属于该分类的物品转移到"其他"分类
+                const items = this.getItems();
+                const updatedItems = items.map(item => {
+                    if (item.category == id || item.category.toString() === id.toString()) {
+                        return { ...item, category: otherCategory.id };
+                    }
+                    return item;
+                });
+
+                // 保存更新后的物品
+                this.saveItems(updatedItems);
+
+                // 删除分类
                 const filteredCategories = categories.filter(category => category.id != id && category.id.toString() !== id.toString());
-                console.log('删除后的分类:', filteredCategories);
                 const result = this.saveCategories(filteredCategories);
                 console.log('删除分类结果:', result);
                 return result;
@@ -3512,8 +3639,42 @@
                 return false;
             }
 
+            // 删除订阅分类（将该分类下的订阅转移到"其他"分类）
             deleteSubscriptionCategory(id) {
                 const categories = this.getSubscriptionCategories();
+
+                // 找到"其他"分类
+                const otherCategory = categories.find(c => c.name === '其他');
+                if (!otherCategory) {
+                    console.error('未找到"其他"分类');
+                    return false;
+                }
+
+                // 防止删除"其他"分类本身
+                const categoryToDelete = categories.find(c => c.id === id);
+                if (!categoryToDelete) {
+                    console.error('分类不存在:', id);
+                    return false;
+                }
+
+                if (categoryToDelete.name === '其他') {
+                    console.error('不能删除"其他"分类');
+                    return false;
+                }
+
+                // 将属于该分类的订阅转移到"其他"分类
+                const subscriptions = this.getSubscriptions();
+                const updatedSubscriptions = subscriptions.map(sub => {
+                    if (sub.category === id) {
+                        return { ...sub, category: otherCategory.id };
+                    }
+                    return sub;
+                });
+
+                // 保存更新后的订阅
+                this.saveSubscriptions(updatedSubscriptions);
+
+                // 删除分类
                 const filtered = categories.filter(c => c.id !== id);
                 return this.saveSubscriptionCategories(filtered);
             }
@@ -3780,9 +3941,9 @@
             renderSubscriptionPanel() {
                 this.updateQuickStats();
                 this.renderSubscriptionCategoryTabs();
-                this.renderSubscriptionList();
                 this.renderCalendar();
                 this.renderCharts();
+                this.renderSubscriptionList();
             }
 
             // 更新快速统计
@@ -3879,6 +4040,10 @@
                         ? '明天扣费'
                         : `${daysUntil}天后扣费`;
 
+                    // 获取分类名称
+                    const cat = this.storage.getSubscriptionCategoryById(sub.category);
+                    const categoryName = cat ? cat.name : '未分类';
+
                     return `
                         <div class="subscription-card" data-id="${sub.id}">
                             <div class="subscription-header">
@@ -3886,7 +4051,7 @@
                                     <span class="subscription-icon">${sub.icon || '📦'}</span>
                                     <span>${sub.name}</span>
                                 </div>
-                                <div class="subscription-category">${sub.category || '未分类'}</div>
+                                <div class="subscription-category">${categoryName}</div>
                             </div>
                             <div class="subscription-price">¥${sub.price}<span class="subscription-price-unit">/${cycleText}</span></div>
                             <div class="subscription-billing ${billingClass}">💰 ${sub.nextBillingDate || '无'} (${billingText})</div>
@@ -4291,15 +4456,17 @@
 
             // 删除订阅
             deleteSubscription(id) {
-                if (confirm('确定要删除这个订阅吗？此操作不可恢复。')) {
-                    const result = this.storage.deleteSubscription(id);
-                    if (result) {
-                        this.renderSubscriptionPanel();
-                        this.app.showToast('订阅删除成功！', 'success');
-                    } else {
-                        this.app.showToast('删除失败，请重试！', 'error');
+                this.app.confirm('删除订阅', '确定要删除这个订阅吗？此操作不可恢复。', (confirmed) => {
+                    if (confirmed) {
+                        const result = this.storage.deleteSubscription(id);
+                        if (result) {
+                            this.renderSubscriptionPanel();
+                            this.app.showToast('订阅删除成功！', 'success');
+                        } else {
+                            this.app.showToast('删除失败，请重试！', 'error');
+                        }
                     }
-                }
+                });
             }
 
             // ============================================================
@@ -4515,15 +4682,23 @@
 
                 const categories = this.storage.getSubscriptionCategories();
 
-                container.innerHTML = categories.map(cat => `
-                    <div class="manage-item">
-                        <div class="manage-item-name">${cat.icon} ${cat.name}</div>
-                        <div class="manage-item-actions">
-                            <button class="edit" data-id="${cat.id}">编辑</button>
-                            <button class="delete" data-id="${cat.id}">删除</button>
+                container.innerHTML = categories.map(cat => {
+                    // "其他"分类不显示编辑和删除按钮
+                    const isOther = cat.name === '其他';
+                    const actions = isOther
+                        ? '<span style="color: var(--text-light); font-size: 12px;">默认分类</span>'
+                        : `<button class="edit" data-id="${cat.id}">编辑</button>
+                           <button class="delete" data-id="${cat.id}">删除</button>`;
+
+                    return `
+                        <div class="manage-item">
+                            <div class="manage-item-name">${cat.icon} ${cat.name}</div>
+                            <div class="manage-item-actions">
+                                ${actions}
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             addSubscriptionCategoryInModal() {
@@ -4572,16 +4747,28 @@
                 const cat = this.storage.getSubscriptionCategoryById(id);
                 if (!cat) return;
 
-                if (confirm(`确定要删除分类"${cat.name}"吗？`)) {
-                    const result = this.storage.deleteSubscriptionCategory(id);
-                    if (result) {
-                        this.renderSubscriptionCategoryManageList();
-                        this.renderSubscriptionCategoryTabs();
-                        alert('分类删除成功！');
-                    } else {
-                        alert('删除失败，请重试！');
-                    }
+                // 获取该分类下的订阅数量
+                const subscriptions = this.storage.getSubscriptions();
+                const subsCount = subscriptions.filter(sub => sub.category === id).length;
+
+                let message = `确定要删除分类"${cat.name}"吗？\n\n该分类下的订阅将自动归类到"其他"分类中。`;
+                if (subsCount > 0) {
+                    message = `确定要删除分类"${cat.name}"吗？\n\n该分类下有 ${subsCount} 个订阅，将被自动归类到"其他"分类中。`;
                 }
+
+                this.app.confirm('删除分类', message, (confirmed) => {
+                    if (confirmed) {
+                        const result = this.storage.deleteSubscriptionCategory(id);
+                        if (result) {
+                            this.renderSubscriptionCategoryManageList();
+                            this.renderSubscriptionCategoryTabs();
+                            this.renderSubscriptionList();
+                            this.app.showToast('分类删除成功！', 'success');
+                        } else {
+                            this.app.showToast('删除失败，请重试！', 'error');
+                        }
+                    }
+                });
             }
         }
 
@@ -4749,10 +4936,10 @@
                 // 渲染界面
                 console.log('渲染分类标签');
                 this.renderCategoryTabs();
-                console.log('渲染物品列表');
-                this.renderItems();
                 console.log('更新物品统计信息');
                 this.updateItemStats();
+                console.log('渲染物品列表');
+                this.renderItems();
                 console.log('渲染分类列表');
                 this.renderCategories();
                 console.log('渲染购买渠道列表');
@@ -4794,8 +4981,8 @@
                 this.currentAnalyticsType = type;
 
                 // 更新切换按钮状态
-                document.querySelectorAll('.analytics-type-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.type === type);
+                document.querySelectorAll('.analytics-toggle-option').forEach(option => {
+                    option.classList.toggle('active', option.dataset.type === type);
                 });
 
                 // 显示/隐藏对应内容
@@ -6601,10 +6788,10 @@
                 }
 
                 // 分析类型切换器事件绑定
-                const analyticsTypeBtns = document.querySelectorAll('.analytics-type-btn');
-                analyticsTypeBtns.forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const type = btn.dataset.type;
+                const analyticsOptions = document.querySelectorAll('.analytics-toggle-option');
+                analyticsOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        const type = option.dataset.type;
                         this.switchAnalyticsType(type);
                     });
                 });
@@ -7172,13 +7359,25 @@
                     console.log('渲染分类:', category.name);
                     const item = document.createElement('div');
                     item.className = 'manage-item';
-                    item.innerHTML = `
-                        <div class="manage-item-name">${category.icon} ${category.name}</div>
-                        <div class="manage-item-actions">
-                            <button class="edit" data-id="${category.id}">编辑</button>
-                            <button class="delete" data-id="${category.id}">删除</button>
-                        </div>
-                    `;
+
+                    // "其他"分类不显示编辑和删除按钮
+                    const isOther = category.name === '其他';
+                    if (isOther) {
+                        item.innerHTML = `
+                            <div class="manage-item-name">${category.icon} ${category.name}</div>
+                            <div class="manage-item-actions">
+                                <span style="color: var(--text-light); font-size: 12px;">默认分类</span>
+                            </div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <div class="manage-item-name">${category.icon} ${category.name}</div>
+                            <div class="manage-item-actions">
+                                <button class="edit" data-id="${category.id}">编辑</button>
+                                <button class="delete" data-id="${category.id}">删除</button>
+                            </div>
+                        `;
+                    }
                     manageList.appendChild(item);
                 });
 
@@ -7424,7 +7623,19 @@
             // 在弹窗中删除分类
             deleteCategoryInModal(id) {
                 console.log('删除分类:', id);
-                this.confirm('删除分类', '确定要删除这个分类吗？', (confirmed) => {
+                const cat = this.storage.getCategoryById(id);
+                if (!cat) return;
+
+                // 获取该分类下的物品数量
+                const items = this.storage.getItems();
+                const itemsCount = items.filter(item => item.category == id || item.category.toString() === id.toString()).length;
+
+                let message = `确定要删除分类"${cat.name}"吗？\n\n该分类下的物品将自动归类到"其他"分类中。`;
+                if (itemsCount > 0) {
+                    message = `确定要删除分类"${cat.name}"吗？\n\n该分类下有 ${itemsCount} 个物品，将被自动归类到"其他"分类中。`;
+                }
+
+                this.confirm('删除分类', message, (confirmed) => {
                     if (confirmed) {
                         const result = this.storage.deleteCategory(id);
                         console.log('删除分类结果:', result);
@@ -7738,6 +7949,15 @@
                             panel.classList.add('active');
                             console.log('显示面板:', tabId);
 
+                            // 如果切换到物品标签，重新渲染物品面板
+                            if (tabId === 'items') {
+                                // 使用 requestAnimationFrame 确保DOM更新完成后再渲染
+                                requestAnimationFrame(() => {
+                                    this.updateItemStats();
+                                    this.renderItems();
+                                });
+                            }
+
                             // 如果切换到我的标签，重新渲染分类列表、购买渠道列表并更新统计
                             if (tabId === 'settings') {
                                 this.renderCategories();
@@ -7747,7 +7967,10 @@
 
                             // 如果切换到订阅标签，渲染订阅面板
                             if (tabId === 'subscription') {
-                                this.subscriptionUI.renderSubscriptionPanel();
+                                // 使用 requestAnimationFrame 确保DOM更新完成后再渲染
+                                requestAnimationFrame(() => {
+                                    this.subscriptionUI.renderSubscriptionPanel();
+                                });
                             }
 
                             // 如果切换到分析标签，渲染数据分析
