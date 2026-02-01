@@ -1747,7 +1747,7 @@
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <h1 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;">物藏录</h1>
                         <div style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 500; backdrop-filter: blur(10px);">
-                            共 <span id="total-items-count" style="font-weight: 700;">0</span> 件
+                            共 <span id="total-items-count" style="font-weight: 700;">0</span> 件物品、<span id="total-subscriptions-count" style="font-weight: 700;">0</span> 个订阅
                         </div>
                     </div>
                     
@@ -6359,14 +6359,19 @@
                 
                 // 更新DOM
                 const totalItemsElement = document.getElementById('total-items-count');
+                const totalSubscriptionsElement = document.getElementById('total-subscriptions-count');
                 const totalAssetsElement = document.getElementById('total-assets');
                 const dailyAverageElement = document.getElementById('daily-average');
                 const avgPriceElement = document.getElementById('avg-price');
-                
+
                 if (totalItemsElement) {
                     totalItemsElement.textContent = totalItems;
                 }
-                
+
+                if (totalSubscriptionsElement) {
+                    totalSubscriptionsElement.textContent = subscriptions.length;
+                }
+
                 if (totalAssetsElement) {
                     totalAssetsElement.textContent = `¥${totalAssets.toFixed(2)}`;
                 }
