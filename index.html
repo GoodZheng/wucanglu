@@ -434,12 +434,24 @@
             font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex: 1 1 auto;
             min-width: 0;
             margin-right: 8px;
             overflow: hidden;
+        }
+
+        .item-name span:not(.item-icon) {
+            overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        .item-icon {
+            font-size: 24px;
+            flex-shrink: 0;
         }
         
         .item-days {
@@ -850,7 +862,7 @@
         .subscription-card {
             background: var(--background-primary);
             border-radius: var(--border-radius);
-            padding: 16px;
+            padding: 12px;
             box-shadow: var(--box-shadow);
             cursor: pointer;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -864,6 +876,103 @@
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
+        }
+
+        .subscription-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow-hover);
+            border-color: var(--primary-color);
+        }
+
+        .subscription-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .subscription-card:hover::before {
+            opacity: 1;
+        }
+
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .subscription-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .subscription-name span:not(.subscription-icon) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .subscription-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .subscription-category {
+            font-size: 11px;
+            color: var(--primary-color);
+            font-weight: 500;
+            background: rgba(67, 97, 238, 0.1);
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .subscription-footer {
+            margin-top: auto;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subscription-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .subscription-price-unit {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: 2px;
+        }
+
+        .subscription-billing {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 0;
+            text-align: right;
         }
 
         .subscription-card:hover {
@@ -958,31 +1067,9 @@
             font-weight: 600;
         }
 
-        .subscription-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: auto;
-            padding-top: 12px;
-        }
-
-        .subscription-actions button {
-            flex: 1;
-            padding: 6px 12px;
-            font-size: 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .subscription-actions button.edit {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .subscription-actions button.delete {
-            background: #ef4444;
-            color: white;
+        .subscription-billing.soon {
+            color: #f59e0b;
+            font-weight: 500;
         }
 
         /* 日历样式 */
@@ -1238,7 +1325,8 @@
         
         /* 模态框样式 */
         #add-item-modal,
-        #item-detail-modal {
+        #item-detail-modal,
+        #subscription-detail-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -1252,14 +1340,16 @@
             justify-content: center;
             animation: fadeIn 0.2s ease;
         }
-        
+
         #add-item-modal.active,
-        #item-detail-modal.active {
+        #item-detail-modal.active,
+        #subscription-detail-modal.active {
             display: flex;
         }
-        
+
         #add-item-modal > div,
-        #item-detail-modal > div {
+        #item-detail-modal > div,
+        #subscription-detail-modal > div {
             background: var(--background-primary);
             border-radius: 16px;
             padding: 28px;
@@ -1273,26 +1363,30 @@
         }
         
         #add-item-modal > div::-webkit-scrollbar,
-        #item-detail-modal > div::-webkit-scrollbar {
+        #item-detail-modal > div::-webkit-scrollbar,
+        #subscription-detail-modal > div::-webkit-scrollbar {
             width: 4px;
         }
-        
+
         #add-item-modal > div::-webkit-scrollbar-track,
-        #item-detail-modal > div::-webkit-scrollbar-track {
+        #item-detail-modal > div::-webkit-scrollbar-track,
+        #subscription-detail-modal > div::-webkit-scrollbar-track {
             background: transparent;
         }
-        
+
         #add-item-modal > div::-webkit-scrollbar-thumb,
-        #item-detail-modal > div::-webkit-scrollbar-thumb {
+        #item-detail-modal > div::-webkit-scrollbar-thumb,
+        #subscription-detail-modal > div::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.1);
             border-radius: 2px;
         }
-        
+
         #add-item-modal > div::-webkit-scrollbar-thumb:hover,
-        #item-detail-modal > div::-webkit-scrollbar-thumb:hover {
+        #item-detail-modal > div::-webkit-scrollbar-thumb:hover,
+        #subscription-detail-modal > div::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.2);
         }
-        
+
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
@@ -1303,9 +1397,10 @@
                 transform: translateY(0) scale(1);
             }
         }
-        
+
         #add-item-modal h3,
-        #item-detail-modal h3 {
+        #item-detail-modal h3,
+        #subscription-detail-modal h3 {
             margin-bottom: 24px;
             text-align: center;
             font-size: 18px;
@@ -1463,6 +1558,7 @@
             
             #add-item-modal > div,
             #item-detail-modal > div,
+            #subscription-detail-modal > div,
             #custom-dialog > div {
                 padding: 24px;
                 width: 95%;
@@ -1812,12 +1908,6 @@
             </div>
             
             <div class="panel active" id="items-panel">
-                <!-- 分类标签 -->
-                <div class="category-tabs">
-                    <button class="category-tab active" data-category="all">全部</button>
-                    <!-- 分类标签将通过JavaScript动态生成 -->
-                </div>
-
                 <!-- 快速统计卡片 -->
                 <div class="item-stats-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
                     <div class="stats-card">
@@ -1847,6 +1937,17 @@
                             <div class="stats-label">总价值</div>
                             <div class="stats-value" id="item-total-value">¥0</div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 物品分类标签和操作 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="category-tabs" style="margin-bottom: 0;">
+                        <button class="category-tab active" data-category="all">全部</button>
+                        <!-- 分类标签将通过JavaScript动态生成 -->
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button id="manage-categories-btn" class="btn btn-secondary" style="padding: 8px 16px;">📁 管理分类</button>
                     </div>
                 </div>
 
@@ -2421,12 +2522,10 @@
                 </select>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                <button class="btn btn-danger" id="delete-item-detail" style="background-color: #dc3545; border-color: #dc3545;">删除物品</button>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-secondary" id="close-detail">关闭</button>
-                    <button class="btn btn-primary" id="save-item-detail">保存</button>
-                </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" id="close-detail">取消</button>
+                <button class="btn btn-primary" id="save-item-detail">保存</button>
+                <button class="btn btn-danger" id="delete-item-detail">删除</button>
             </div>
         </div>
     </div>
@@ -2584,6 +2683,126 @@
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                 <button class="btn btn-secondary" id="cancel-subscription">取消</button>
                 <button class="btn btn-primary" id="save-subscription">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 订阅详情弹窗 -->
+    <div id="subscription-detail-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background-color: white; padding: 24px; border-radius: 8px; width: 90%; max-width: 500px;">
+            <h3>订阅详情</h3>
+            <div class="form-group">
+                <label>订阅名称 <span style="color: #f5222d;">*</span></label>
+                <input type="text" id="detail-subscription-name">
+            </div>
+            <div class="form-group">
+                <label>分类 <span style="color: #f5222d;">*</span></label>
+                <select id="detail-subscription-category">
+                    <!-- 分类选项将通过JavaScript动态生成 -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>图标</label>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div id="detail-subscription-icon-preview" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 28px; background: var(--background-secondary); border-radius: 8px; border: 1px solid var(--border-color);">🎬</div>
+                    <button id="detail-subscription-icon-picker-btn" type="button" class="btn btn-secondary" style="padding: 8px 16px;">选择图标</button>
+                </div>
+                <input type="hidden" id="detail-subscription-icon">
+            </div>
+            <div class="form-group">
+                <label>价格 (¥) <span style="color: #f5222d;">*</span></label>
+                <input type="number" id="detail-subscription-price" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label>周期类型 <span style="color: #f5222d;">*</span></label>
+                <select id="detail-subscription-cycle-type">
+                    <option value="day">按天</option>
+                    <option value="week">按周</option>
+                    <option value="month">按月</option>
+                    <option value="quarter">按季</option>
+                    <option value="year">按年</option>
+                    <option value="lifetime">终身有效</option>
+                </select>
+            </div>
+            <div class="form-group" id="detail-first-billing-date-group">
+                <label id="detail-billing-date-label">扣费日期 <span style="color: #f5222d;">*</span></label>
+                <!-- 按周：选择星期几 -->
+                <div id="detail-billing-day-of-week" style="display: none;">
+                    <select id="detail-subscription-day-of-week" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <option value="1">周一</option>
+                        <option value="2">周二</option>
+                        <option value="3">周三</option>
+                        <option value="4">周四</option>
+                        <option value="5">周五</option>
+                        <option value="6">周六</option>
+                        <option value="0">周日</option>
+                    </select>
+                </div>
+                <!-- 按月：选择几号 -->
+                <div id="detail-billing-day-of-month" style="display: none;">
+                    <select id="detail-subscription-day-of-month" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"></select>
+                </div>
+                <!-- 按季：选择月份和日期 -->
+                <div id="detail-billing-day-of-quarter" style="display: none;">
+                    <select id="detail-subscription-quarter-month" style="width: 48%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; display: inline-block;">
+                        <option value="1">1月</option>
+                        <option value="4">4月</option>
+                        <option value="7">7月</option>
+                        <option value="10">10月</option>
+                    </select>
+                    <span style="display: inline-block; width: 4%; text-align: center;">月</span>
+                    <select id="detail-subscription-quarter-day" style="width: 48%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; display: inline-block;"></select>
+                    <span style="display: inline-block; width: 4%; text-align: center;">日</span>
+                </div>
+                <!-- 按年：选择月-日 -->
+                <div id="detail-billing-day-of-year" style="display: none;">
+                    <select id="detail-subscription-month" style="width: 48%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; display: inline-block;"></select>
+                    <span style="display: inline-block; width: 4%; text-align: center;">月</span>
+                    <select id="detail-subscription-day-of-year-day" style="width: 48%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; display: inline-block;"></select>
+                    <span style="display: inline-block; width: 4%; text-align: center;">日</span>
+                </div>
+                <!-- 按天：提示每天扣费 -->
+                <div id="detail-billing-day-hint" style="display: none;">
+                    <div style="padding: 10px; background: var(--background-secondary); border-radius: 6px; color: var(--text-secondary);">每天扣费，无需选择日期</div>
+                </div>
+                <small id="detail-billing-date-hint" style="color: var(--text-secondary);">选择下次扣费的日期，系统会自动计算后续扣费时间</small>
+            </div>
+            <!-- 终身订阅的特殊选项 -->
+            <div class="form-group" id="detail-lifetime-options-group" style="display: none;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <input type="checkbox" id="detail-lifetime-include-daily" style="width: 18px; height: 18px;">
+                    <label for="detail-lifetime-include-daily" style="margin: 0;">计入日均成本</label>
+                </div>
+                <div id="detail-lifetime-purchase-date-group" style="display: none;">
+                    <label style="font-size: 14px; color: var(--text-primary); margin-bottom: 6px; display: block;">购买日期</label>
+                    <input type="date" id="detail-lifetime-purchase-date" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <small style="color: var(--text-secondary);">将按购买日期到现在的天数计算日均成本</small>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>提醒设置</label>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <input type="checkbox" id="detail-subscription-reminder-enabled" style="width: 18px; height: 18px;">
+                    <label for="detail-subscription-reminder-enabled" style="margin: 0;">启用到期提醒</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="detail-subscription-reminder-days" style="margin: 0;">提前</label>
+                    <input type="number" id="detail-subscription-reminder-days" value="1" min="0" max="30" style="width: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <label for="detail-subscription-reminder-days" style="margin: 0;">天提醒</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="detail-subscription-notes" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>官网</label>
+                <input type="url" id="detail-subscription-website">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" id="close-subscription-detail">取消</button>
+                <button class="btn btn-primary" id="save-subscription-detail">保存</button>
+                <button class="btn btn-danger" id="delete-subscription-detail">删除</button>
             </div>
         </div>
     </div>
@@ -3008,6 +3227,11 @@
                 const category = categories.find(category => category.id == id || category.id.toString() === id.toString());
                 console.log('找到的分类:', category);
                 return category || null;
+            }
+
+            getCategoryByName(name) {
+                const categories = this.getCategories();
+                return categories.find(category => category.name === name) || null;
             }
 
             // 获取所有购买渠道
@@ -3979,7 +4203,14 @@
                     container.appendChild(btn);
                 }
 
-                categories.forEach(category => {
+                // 排序：把"其他"分类放在最后
+                const sortedCategories = [...categories].sort((a, b) => {
+                    if (a.name === '其他') return 1;
+                    if (b.name === '其他') return -1;
+                    return 0;
+                });
+
+                sortedCategories.forEach(category => {
                     const btn = document.createElement('button');
                     btn.className = 'category-tab';
                     btn.dataset.category = category.name;
@@ -4053,11 +4284,9 @@
                                 </div>
                                 <div class="subscription-category">${categoryName}</div>
                             </div>
-                            <div class="subscription-price">¥${sub.price}<span class="subscription-price-unit">/${cycleText}</span></div>
-                            <div class="subscription-billing ${billingClass}">💰 ${sub.nextBillingDate || '无'} (${billingText})</div>
-                            <div class="subscription-actions">
-                                <button class="edit" data-id="${sub.id}">编辑</button>
-                                <button class="delete" data-id="${sub.id}">删除</button>
+                            <div class="subscription-footer">
+                                <div class="subscription-price">¥${sub.price}<span class="subscription-price-unit">/${cycleText}</span></div>
+                                <div class="subscription-billing ${billingClass}">${sub.nextBillingDate || '无'} (${billingText})</div>
                             </div>
                         </div>
                     `;
@@ -4469,6 +4698,160 @@
                 });
             }
 
+            // 显示订阅详情
+            showSubscriptionDetail(id) {
+                const subscription = this.storage.getSubscriptionById(id);
+                if (!subscription) return;
+
+                const detailModal = document.getElementById('subscription-detail-modal');
+                if (!detailModal) return;
+
+                // 设置订阅名称
+                const detailName = document.getElementById('detail-subscription-name');
+                if (detailName) detailName.value = subscription.name || '';
+
+                // 设置价格
+                const detailPrice = document.getElementById('detail-subscription-price');
+                if (detailPrice) detailPrice.value = subscription.price || 0;
+
+                // 设置周期类型
+                const detailCycleType = document.getElementById('detail-subscription-cycle-type');
+                if (detailCycleType) detailCycleType.value = subscription.cycleType || 'month';
+
+                // 设置图标
+                const detailIcon = document.getElementById('detail-subscription-icon');
+                const detailIconPreview = document.getElementById('detail-subscription-icon-preview');
+                if (detailIcon) detailIcon.value = subscription.icon || '🎬';
+                if (detailIconPreview) detailIconPreview.textContent = subscription.icon || '🎬';
+
+                // 设置分类
+                const detailCategory = document.getElementById('detail-subscription-category');
+                if (detailCategory) {
+                    // 填充分类选项
+                    const categories = this.storage.getSubscriptionCategories();
+                    detailCategory.innerHTML = categories.map(cat =>
+                        `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`
+                    ).join('');
+                    detailCategory.value = subscription.category || '';
+                }
+
+                // 设置备注
+                const detailNotes = document.getElementById('detail-subscription-notes');
+                if (detailNotes) detailNotes.value = subscription.notes || '';
+
+                // 设置官网
+                const detailWebsite = document.getElementById('detail-subscription-website');
+                if (detailWebsite) detailWebsite.value = subscription.website || '';
+
+                // 设置提醒
+                const detailReminderEnabled = document.getElementById('detail-subscription-reminder-enabled');
+                const detailReminderDays = document.getElementById('detail-subscription-reminder-days');
+                if (detailReminderEnabled) detailReminderEnabled.checked = subscription.reminderEnabled !== false;
+                if (detailReminderDays) detailReminderDays.value = subscription.reminderDays || 1;
+
+                // 存储当前编辑的订阅
+                this.currentEditingSubscription = subscription;
+
+                // 保存原始值用于比较是否有修改
+                const originalValues = {
+                    '#detail-subscription-name': subscription.name || '',
+                    '#detail-subscription-price': (subscription.price || 0).toString(),
+                    '#detail-subscription-notes': subscription.notes || '',
+                    '#detail-subscription-website': subscription.website || ''
+                };
+                detailModal.dataset.originalValues = JSON.stringify(originalValues);
+                console.log('订阅详情弹窗 - 已保存原始值:', originalValues);
+
+                detailModal.style.display = 'flex';
+            }
+
+            // 保存订阅详情
+            saveSubscriptionDetail() {
+                if (!this.currentEditingSubscription) return;
+
+                const name = document.getElementById('detail-subscription-name').value.trim();
+                const price = parseFloat(document.getElementById('detail-subscription-price').value) || 0;
+                const category = document.getElementById('detail-subscription-category').value;
+                const icon = document.getElementById('detail-subscription-icon').value;
+                const cycleType = document.getElementById('detail-subscription-cycle-type').value;
+                const notes = document.getElementById('detail-subscription-notes').value.trim();
+                const website = document.getElementById('detail-subscription-website').value.trim();
+                const reminderEnabled = document.getElementById('detail-subscription-reminder-enabled').checked;
+                const reminderDays = parseInt(document.getElementById('detail-subscription-reminder-days').value) || 1;
+
+                if (!name) {
+                    this.app.showToast('请输入订阅名称', 'error');
+                    return;
+                }
+
+                const updatedSubscription = {
+                    ...this.currentEditingSubscription,
+                    name,
+                    price,
+                    category,
+                    icon,
+                    cycleType,
+                    notes,
+                    website,
+                    reminderEnabled,
+                    reminderDays
+                };
+
+                const result = this.storage.updateSubscription(updatedSubscription);
+                if (result) {
+                    this.renderSubscriptionPanel();
+                    this.closeSubscriptionDetail();
+                    this.app.showToast('订阅更新成功！', 'success');
+                } else {
+                    this.app.showToast('更新失败，请重试！', 'error');
+                }
+            }
+
+            // 关闭订阅详情弹窗
+            closeSubscriptionDetail() {
+                const detailModal = document.getElementById('subscription-detail-modal');
+                if (detailModal) {
+                    detailModal.style.display = 'none';
+                }
+                this.currentEditingSubscription = null;
+            }
+
+            // 从详情弹窗删除订阅
+            deleteSubscriptionDetail() {
+                if (!this.currentEditingSubscription) return;
+
+                this.app.confirm('删除订阅', '确定要删除这个订阅吗？此操作不可恢复。', (confirmed) => {
+                    if (confirmed) {
+                        const result = this.storage.deleteSubscription(this.currentEditingSubscription.id);
+                        if (result) {
+                            this.renderSubscriptionPanel();
+                            this.closeSubscriptionDetail();
+                            this.app.showToast('订阅删除成功！', 'success');
+                        } else {
+                            this.app.showToast('删除失败，请重试！', 'error');
+                        }
+                    }
+                });
+            }
+
+            // 获取订阅图标的中文名称
+            getSubscriptionIconName(icon) {
+                const iconNames = {
+                    '🎬': '场记板', '🎞️': '胶片', '📺': '电视', '🎵': '音符', '🎤': '话筒', '🎧': '耳机', '🎸': '吉他', '🎹': '钢琴', '🎺': '小号',
+                    '🎻': '小提琴', '🪕': '班卓琴', '🥁': '鼓', '🪘': '长鼓', '🎷': '萨克斯', '🎮': '游戏机', '🕹️': '摇杆',
+                    '🎰': '老虎机', '🎲': '骰子', '🎳': '保龄球', '🃏': '国际象棋', '🀄': '围棋', '🎱': '台球', '🎯': '靶心',
+                    '📚': '书籍', '📖': '书本', '💻': '电脑', '⌨️': '键盘', '🖥️': '显示器', '🖨️': '打印机', '💾': '软盘',
+                    '🏠': '房子', '✈️': '飞机', '🍔': '汉堡', '☕': '咖啡', '💊': '药丸', '👕': 'T恤', '⚽': '足球',
+                    '🏋️': '举重', '🎨': '调色板', '🔧': '扳手', '🎁': '礼物', '🎈': '气球', '🎉': '拉炮', '🎊': '糖果',
+                    '🔔': '铃铛', '🔕': '静音', '📿': '念珠', '⭐': '星星', '🌟': '闪星', '💫': '流星', '✨': '星光',
+                    '💰': '钱袋', '💵': '美元', '💴': '日元', '💶': '欧元', '💷': '英镑', '💳': '银行卡', '🧾': '收据',
+                    '⏱️': '秒表', '⏰': '闹钟', '🏦': '银行', '🏥': '医院', '🚗': '汽车', '🚕': '出租车', '🚌': '公交车',
+                    '🛒': '购物车', '🛍️': '购物袋', '👑': '皇冠', '💍': '戒指', '💎': '宝石', '💄': '口红',
+                    '🔮': '水晶球', '🎪': '马戏团', '🎭': '面具', '🏆': '奖杯', '🏅': '奖牌'
+                };
+                return iconNames[icon] || icon;
+            }
+
             // ============================================================
             // 扣费日期处理
             // ============================================================
@@ -4682,7 +5065,14 @@
 
                 const categories = this.storage.getSubscriptionCategories();
 
-                container.innerHTML = categories.map(cat => {
+                // 排序：把"其他"分类放在最后
+                const sortedCategories = [...categories].sort((a, b) => {
+                    if (a.name === '其他') return 1;
+                    if (b.name === '其他') return -1;
+                    return 0;
+                });
+
+                container.innerHTML = sortedCategories.map(cat => {
                     // "其他"分类不显示编辑和删除按钮
                     const isOther = cat.name === '其他';
                     const actions = isOther
@@ -4702,23 +5092,189 @@
             }
 
             addSubscriptionCategoryInModal() {
-                const name = prompt('请输入分类名称：');
-                if (!name || !name.trim()) return;
+                try {
+                    console.log('开始添加订阅分类');
 
-                const icons = Object.values(this.storage.iconLibrary).flat();
-                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                    // 预制图标库（带名称）
+                    const iconLibrary = {
+                        '全部': ['📦', '🎬', '🎵', '📚', '💻', '🎮', '🏠', '✈️', '🍔', '☕', '💊', '👕', '⚽', '🏋️', '🎨', '🔧'],
+                        '娱乐': ['🎬', '🎞️', '📺', '🎵', '🎤', '🎧', '🎸', '🎹', '🎻', '🎺', '🥁', '🪘', '🎷', '🎮', '🕹️', '🎰', '🎲', '🃏', '🎯', '🀄', '🎱', '🪅', '🎪'],
+                        '学习': ['📚', '📖', '📕', '📗', '📘', '📙', '📓', '📔', '📒', '📃', '📄', '📰', '🗞️', '🔖', '🏷️', '✏️', '✒️', '📐', '📏', '🔢', '➗', '✖️'],
+                        '办公': ['💻', '⌨️', '🖥️', '🖨️', '🖱️', '💾', '💿', '📱', '☎️', '📞', '📟', '📠', '🖨️', '🖍️', '🔎', '📊', '📈', '📉', '📋', '📌', '📎', '🔖', '✏️', '📝'],
+                        '工具': ['🔧', '🔨', '⚒️', '🛠️', '⛏️', '🪓', '🔩', '⚙️', '🗜️', '🔗', '⛓️', '🧰', '🧲', '🪑', '🪛', '🪚', '🔋', '🔌', '💡', '🔦', '🕯️', '🪔', '🧯', '🛢️'],
+                        '金融': ['💰', '💵', '💴', '💶', '💷', '💸', '💳', '🧾', '💹', '📉', '📈', '🏧', '💱', '💲', '⏱️', '⏰', '🏅', '🏦'],
+                        '生活': ['🏠', '🏡', '🏘️', '🏚️', '🏗️', '🏢', '🏬', '🏪', '🏫', '⛽️', '🚗', '🚕', '🚙', '🚌', '🚎', '🚓', '🚑', '🛒', '🛍️'],
+                        '健康': ['💊', '💉', '🩺', '🏥', '🏥', '🦷', '🦴', '🦵', '🏃', '🏋️', '🧘', '🧘', '🧍', '🚑'],
+                        '饮食': ['🍔', '🍟', '🍕', '🌭', '🍿', '🧂', '🍿', '🥩', '🍗', '🍖', '🌮', '🌯', '🥙', '🥘', '🥗', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍤', '🍱', '🥢', '🧁', '🥧', '🍨', '🍩', '🍪', '🍫', '🍬', '🍭', '🍮', '🍯', '☕', '🍵', '🥤', '🧋'],
+                        '其他': ['🔮', '🎁', '🎈', '🎉', '🎊', '🎀', '🎏�', '🔔', '🔕', '📿', '⭐', '🌟', '💫', '✨', '💎', '💍', '👑', '👜', '🎗', '🏆', '🏅']
+                    };
 
-                const result = this.storage.addSubscriptionCategory({
-                    name: name.trim(),
-                    icon: randomIcon
-                });
+                    // 创建自定义对话框
+                    const dialog = document.createElement('div');
+                    dialog.style.cssText = 'display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);';
 
-                if (result) {
-                    this.renderSubscriptionCategoryManageList();
-                    this.renderSubscriptionCategoryTabs();
-                    alert('分类添加成功！');
-                } else {
-                    alert('添加失败，请重试！');
+                    dialog.innerHTML = `
+                        <div style="background-color: white; padding: 24px; border-radius: 16px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);">
+                            <h4 style="margin-top: 0; margin-bottom: 16px; font-size: 18px; font-weight: 600;">添加分类</h4>
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">分类名称</label>
+                                <input type="text" id="subscription-category-name-input" placeholder="请输入分类名称" style="width: 100%; padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">分类图标</label>
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                    <div id="subscription-selected-icon-display" style="width: 48px; height: 48px; border: 2px solid #4361ee; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; background: #f0f4ff;">🎬</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500; color: #374151; font-size: 14px;" id="subscription-selected-icon-name">电影</div>
+                                        <div style="color: #9ca3af; font-size: 12px;">点击下方图标选择</div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <div id="subscription-icon-category-tabs" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                                        ${Object.keys(iconLibrary).map(cat =>
+                                            `<button class="subscription-icon-category-tab ${cat === '全部' ? 'active' : ''}" data-category="${cat}" style="padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 16px; background: ${cat === '全部' ? '#4361ee' : 'white'}; color: ${cat === '全部' ? 'white' : '#374151'}; font-size: 12px; cursor: pointer; transition: all 0.2s;">${cat}</button>`
+                                        ).join('')}
+                                    </div>
+                                </div>
+                                <div id="subscription-icon-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 8px; max-height: 240px; overflow-y: auto; padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    ${iconLibrary['全部'].map(icon =>
+                                        `<div class="subscription-icon-option" data-icon="${icon}" style="display: flex; flex-direction: column; align-items: center; padding: 6px; cursor: pointer; border-radius: 6px; transition: all 0.2s; border: 2px solid transparent;">
+                                            <div style="font-size: 28px; margin-bottom: 2px;">${icon}</div>
+                                            <div style="font-size: 11px; color: #6b7280; text-align: center; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.getSubscriptionIconName(icon)}</div>
+                                        </div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+                                <button id="subscription-category-cancel-btn" class="btn btn-secondary">取消</button>
+                                <button id="subscription-category-confirm-btn" class="btn btn-primary">确定</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(dialog);
+
+                    const nameInput = dialog.querySelector('#subscription-category-name-input');
+                    const iconDisplay = dialog.querySelector('#subscription-selected-icon-display');
+                    const iconNameDisplay = dialog.querySelector('#subscription-selected-icon-name');
+                    const iconGrid = dialog.querySelector('#subscription-icon-grid');
+                    const categoryTabs = dialog.querySelectorAll('.subscription-icon-category-tab');
+                    const cancelBtn = dialog.querySelector('#subscription-category-cancel-btn');
+                    const confirmBtn = dialog.querySelector('#subscription-category-confirm-btn');
+
+                    let selectedIcon = '🎬';
+
+                    // 自动聚焦到名称输入框
+                    setTimeout(() => nameInput.focus(), 100);
+
+                    // 图标分类切换
+                    categoryTabs.forEach(tab => {
+                        tab.addEventListener('click', () => {
+                            // 更新激活状态
+                            categoryTabs.forEach(t => {
+                                t.classList.remove('active');
+                                t.style.background = 'white';
+                                t.style.color = '#374151';
+                            });
+                            tab.classList.add('active');
+                            tab.style.background = '#4361ee';
+                            tab.style.color = 'white';
+
+                            // 更新图标网格
+                            const category = tab.dataset.category;
+                            iconGrid.innerHTML = iconLibrary[category].map(icon =>
+                                `<div class="subscription-icon-option" data-icon="${icon}" style="display: flex; flex-direction: column; align-items: center; padding: 6px; cursor: pointer; border-radius: 6px; transition: all 0.2s; border: 2px solid transparent;">
+                                    <div style="font-size: 28px; margin-bottom: 2px;">${icon}</div>
+                                    <div style="font-size: 11px; color: #6b7280; text-align: center; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.getSubscriptionIconName(icon)}</div>
+                                </div>`
+                            ).join('');
+
+                            // 重新绑定图标点击事件
+                            bindIconClickEvents();
+                        });
+                    });
+
+                    // 绑定图标点击事件
+                    const self = this;
+                    function bindIconClickEvents() {
+                        const iconOptions = dialog.querySelectorAll('.subscription-icon-option');
+                        iconOptions.forEach(option => {
+                            option.addEventListener('click', () => {
+                                selectedIcon = option.dataset.icon;
+                                iconDisplay.textContent = selectedIcon;
+                                iconNameDisplay.textContent = self.getSubscriptionIconName(selectedIcon);
+
+                                // 更新选中状态
+                                iconOptions.forEach(opt => {
+                                    opt.style.border = '2px solid transparent';
+                                    opt.style.background = 'transparent';
+                                });
+                                option.style.border = '2px solid #4361ee';
+                                option.style.background = '#f0f4ff';
+                            });
+
+                            // 悬停效果
+                            option.addEventListener('mouseenter', () => {
+                                if (option.dataset.icon !== selectedIcon) {
+                                    option.style.background = '#e5e7eb';
+                                }
+                            });
+                            option.addEventListener('mouseleave', () => {
+                                if (option.dataset.icon !== selectedIcon) {
+                                    option.style.background = 'transparent';
+                                }
+                            });
+                        });
+                    }
+
+                    bindIconClickEvents();
+
+                    // 取消按钮
+                    cancelBtn.addEventListener('click', () => {
+                        document.body.removeChild(dialog);
+                    });
+
+                    // 确定按钮
+                    confirmBtn.addEventListener('click', () => {
+                        const categoryName = nameInput.value.trim();
+
+                        if (!categoryName) {
+                            alert('请输入分类名称');
+                            return;
+                        }
+
+                        const result = this.storage.addSubscriptionCategory({
+                            name: categoryName,
+                            icon: selectedIcon
+                        });
+
+                        if (result) {
+                            this.renderSubscriptionCategoryManageList();
+                            this.renderSubscriptionCategoryTabs();
+                            this.app.showToast('分类添加成功！', 'success');
+                        } else {
+                            this.app.showToast('添加失败，请重试！', 'error');
+                        }
+
+                        document.body.removeChild(dialog);
+                    });
+
+                    // 支持回车键确认
+                    nameInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            confirmBtn.click();
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('addSubscriptionCategoryInModal方法执行失败:', error);
+                    console.error('错误详情:', error.message);
+                    console.error('错误堆栈:', error.stack);
+                    if (this.app) {
+                        this.app.showToast('添加分类时发生错误，请重试！', 'error');
+                    } else {
+                        alert('添加分类时发生错误：' + error.message);
+                    }
                 }
             }
 
@@ -6534,24 +7090,15 @@
             bindSubscriptionEvents() {
                 console.log('开始绑定订阅相关事件');
 
-                // 订阅列表事件委托（编辑和删除按钮）
+                // 订阅列表点击事件（点击卡片弹出详情）
                 const subscriptionList = document.getElementById('subscription-list');
                 if (subscriptionList) {
                     subscriptionList.addEventListener('click', (e) => {
-                        const editBtn = e.target.closest('.subscription-actions .edit');
-                        const deleteBtn = e.target.closest('.subscription-actions .delete');
-
-                        if (editBtn) {
-                            const id = editBtn.dataset.id;
+                        const card = e.target.closest('.subscription-card');
+                        if (card) {
+                            const id = card.dataset.id;
                             if (id) {
-                                this.subscriptionUI.openEditSubscriptionDialog(id);
-                            }
-                        }
-
-                        if (deleteBtn) {
-                            const id = deleteBtn.dataset.id;
-                            if (id) {
-                                this.subscriptionUI.deleteSubscription(id);
+                                this.subscriptionUI.showSubscriptionDetail(id);
                             }
                         }
                     });
@@ -6800,39 +7347,70 @@
                         this.switchAnalyticsType(type);
                     });
                 });
+
+                // 订阅详情弹窗按钮事件
+                const closeSubscriptionDetailBtn = document.getElementById('close-subscription-detail');
+                const saveSubscriptionDetailBtn = document.getElementById('save-subscription-detail');
+                const deleteSubscriptionDetailBtn = document.getElementById('delete-subscription-detail');
+                const subscriptionDetailModal = document.getElementById('subscription-detail-modal');
+
+                if (closeSubscriptionDetailBtn) {
+                    closeSubscriptionDetailBtn.addEventListener('click', () => {
+                        this.subscriptionUI.closeSubscriptionDetail();
+                    });
+                }
+
+                if (saveSubscriptionDetailBtn) {
+                    saveSubscriptionDetailBtn.addEventListener('click', () => {
+                        this.subscriptionUI.saveSubscriptionDetail();
+                    });
+                }
+
+                if (deleteSubscriptionDetailBtn) {
+                    deleteSubscriptionDetailBtn.addEventListener('click', () => {
+                        this.subscriptionUI.deleteSubscriptionDetail();
+                    });
+                }
+                // 注意：订阅详情弹窗的点击外部关闭事件由统一的模态框处理机制处理（在 modals 配置中）
             }
 
             // 渲染分类标签
             renderCategoryTabs() {
                 const categoryTabsContainer = document.querySelector('.category-tabs');
                 if (!categoryTabsContainer) return;
-                
+
                 // 保留"全部"标签，移除其他标签
                 const allTab = categoryTabsContainer.querySelector('[data-category="all"]');
                 categoryTabsContainer.innerHTML = '';
                 categoryTabsContainer.appendChild(allTab);
-                
-                // 获取所有分类
+
+                // 获取所有分类并排序，把"其他"放在最后
                 const categories = this.storage.getCategories();
-                categories.forEach(category => {
+                const sortedCategories = [...categories].sort((a, b) => {
+                    if (a.name === '其他') return 1;
+                    if (b.name === '其他') return -1;
+                    return 0;
+                });
+
+                sortedCategories.forEach(category => {
                     const tab = document.createElement('button');
                     tab.className = 'category-tab';
                     tab.dataset.category = category.name;
                     tab.textContent = category.name;
-                    
+
                     // 添加点击事件
                     tab.addEventListener('click', () => {
                         // 更新标签状态
                         document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
                         tab.classList.add('active');
-                        
+
                         // 按分类筛选物品
                         this.renderItems(category.name);
                     });
-                    
+
                     categoryTabsContainer.appendChild(tab);
                 });
-                
+
                 // 为"全部"标签添加点击事件
                 allTab.addEventListener('click', () => {
                     document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
@@ -6915,9 +7493,16 @@
                     }
                     
                     // 设置卡片内容
+                    // 获取分类图标
+                    const category = this.storage.getCategoryByName(item.category);
+                    const categoryIcon = category?.icon || '📦';
+
                     itemCard.innerHTML = `
                         <div class="item-header">
-                            <div class="item-name">${item.name}</div>
+                            <div class="item-name">
+                                <span class="item-icon">${categoryIcon}</span>
+                                <span>${item.name}</span>
+                            </div>
                             <div class="item-days">已使用 ${daysUsed} 天</div>
                         </div>
                         <div class="item-category">${item.category}</div>
@@ -7360,7 +7945,14 @@
                 const categories = this.storage.getCategories();
                 console.log('获取到的分类数量:', categories.length);
 
-                categories.forEach(category => {
+                // 排序：把"其他"分类放在最后
+                const sortedCategories = [...categories].sort((a, b) => {
+                    if (a.name === '其他') return 1;
+                    if (b.name === '其他') return -1;
+                    return 0;
+                });
+
+                sortedCategories.forEach(category => {
                     console.log('渲染分类:', category.name);
                     const item = document.createElement('div');
                     item.className = 'manage-item';
@@ -8152,9 +8744,17 @@
                 console.log('开始绑定快捷管理卡片点击事件');
                 const categoryManageCard = document.getElementById('category-manage-card');
                 const channelManageCard = document.getElementById('channel-manage-card');
+                const manageCategoriesBtn = document.getElementById('manage-categories-btn');
 
                 if (categoryManageCard) {
                     categoryManageCard.addEventListener('click', () => {
+                        this.openCategoryManageModal();
+                    });
+                }
+
+                // 物品界面"管理分类"按钮
+                if (manageCategoriesBtn) {
+                    manageCategoriesBtn.addEventListener('click', () => {
                         this.openCategoryManageModal();
                     });
                 }
@@ -8240,19 +8840,35 @@
             showItemDetail(item) {
                 const detailModal = document.getElementById('item-detail-modal');
                 if (!detailModal) return;
-                
+
+                // 首先设置所有需要跟踪修改的字段
                 const detailItemName = document.getElementById('detail-item-name');
                 if (detailItemName) detailItemName.value = item.name;
-                
-                // 设置价格
+
                 const detailItemPrice = document.getElementById('detail-item-price');
                 if (detailItemPrice) detailItemPrice.value = item.price || 0;
-                
-                // 设置购买日期
+
+                const detailItemDesc = document.getElementById('detail-item-desc');
+                if (detailItemDesc) detailItemDesc.value = item.desc || '';
+
+                const detailItemLocation = document.getElementById('detail-item-location');
+                if (detailItemLocation) detailItemLocation.value = item.location || '';
+
+                // 在显示弹窗之前保存原始值
+                const originalValues = {
+                    '#detail-item-name': item.name || '',
+                    '#detail-item-desc': item.desc || '',
+                    '#detail-item-location': item.location || '',
+                    '#detail-item-price': (item.price || 0).toString()
+                };
+                detailModal.dataset.originalValues = JSON.stringify(originalValues);
+                console.log('物品详情弹窗 - 已保存原始值:', originalValues);
+
+                // 设置购买日期（不需要跟踪修改）
                 const detailItemPurchaseDate = document.getElementById('detail-item-purchase-date');
                 if (detailItemPurchaseDate) detailItemPurchaseDate.value = item.purchaseDate || item.createdAt?.split('T')[0];
-                
-                // 计算并设置日均价值
+
+                // 计算并设置日均价值（不需要跟踪修改）
                 const calculateDailyValue = (price, purchaseDate) => {
                     if (!price || !purchaseDate) return 0;
                     const now = new Date();
@@ -8260,43 +8876,44 @@
                     const days = Math.max(1, Math.ceil((now - purchased) / (1000 * 60 * 60 * 24)));
                     return price / days;
                 };
-                
+
                 const dailyValue = calculateDailyValue(item.price, item.purchaseDate || item.createdAt);
                 const detailItemDailyValue = document.getElementById('detail-item-daily-value');
                 if (detailItemDailyValue) detailItemDailyValue.value = dailyValue.toFixed(2);
-                
+
                 // 存储当前编辑的物品ID
                 this.currentEditingItem = item;
-                
+
+                // 显示弹窗
                 detailModal.style.display = 'flex';
-                
+
                 // 保存this的引用
                 const self = this;
-                
+
                 // 显示模态框后初始化下拉框并设置当前分类
                 setTimeout(function() {
                     self.initCustomSelects();
-                    
+
                     // 设置当前分类
                     const customSelect = document.getElementById('custom-detail-category-select');
                     if (customSelect) {
                         const trigger = customSelect.querySelector('.custom-select-trigger');
                         const hiddenInput = customSelect.querySelector('input[type="hidden"]');
                         const options = customSelect.querySelectorAll('.custom-select-option');
-                        
+
                         if (trigger && hiddenInput && options) {
                             // 获取分类信息，包括图标
                             const categories = self.storage.getCategories();
                             const itemCategory = categories.find(cat => cat.name === item.category);
-                            
+
                             if (itemCategory) {
                                 trigger.textContent = `${itemCategory.icon} ${item.category}`;
                             } else {
                                 trigger.textContent = item.category || '请选择分类';
                             }
-                            
+
                             hiddenInput.value = item.category || '';
-                            
+
                             // 标记选中状态
                             options.forEach(option => {
                                 if (option.dataset.value === item.category) {
@@ -8307,14 +8924,8 @@
                             });
                         }
                     }
-                    
-                    // 设置其他字段
-                    const detailItemDesc = document.getElementById('detail-item-desc');
-                    if (detailItemDesc) detailItemDesc.value = item.desc;
-                    const detailItemLocation = document.getElementById('detail-item-location');
-                    if (detailItemLocation) detailItemLocation.value = item.location;
 
-                    // 设置购买渠道
+                    // 设置购买渠道（不需要跟踪修改）
                     const detailPurchaseChannel = document.getElementById('detail-item-purchase-channel');
                     if (detailPurchaseChannel) {
                         detailPurchaseChannel.value = item.purchaseChannel || '';
@@ -8563,6 +9174,7 @@
                 const modals = [
                     { id: 'add-item-modal', formSelector: '#add-item-modal form', inputs: ['#item-name', '#item-desc', '#item-location', '#item-price'] },
                     { id: 'item-detail-modal', formSelector: '#item-detail-modal form', inputs: ['#detail-item-name', '#detail-item-desc', '#detail-item-location', '#detail-item-price'] },
+                    { id: 'subscription-detail-modal', formSelector: '#subscription-detail-modal form', inputs: ['#detail-subscription-name', '#detail-subscription-price', '#detail-subscription-notes', '#detail-subscription-website'] },
                     { id: 'category-manage-modal', formSelector: null, inputs: [] },
                     { id: 'channel-manage-modal', formSelector: null, inputs: [] }
                 ];
@@ -8571,7 +9183,7 @@
                     const modal = document.getElementById(modalConfig.id);
                     console.log(`找到模态框 ${modalConfig.id}:`, !!modal);
                     if (!modal) return;
-                    
+
                     modal.addEventListener('click', (e) => {
                         // 只有点击模态框背景（不是内容区域）时才触发
                         if (e.target === modal) {
@@ -8585,26 +9197,57 @@
             
             // 处理模态框关闭
             handleModalClose(modal, modalConfig) {
-                // 检查是否有输入内容
-                const hasInput = modalConfig.inputs.some(selector => {
-                    const input = document.querySelector(selector);
-                    return input && input.value && input.value.trim() !== '';
-                });
-                
-                if (hasInput) {
-                    // 有输入内容，询问用户是否保存
-                    this.dialogCallback = (confirmed) => {
-                        if (confirmed) {
-                            // 确认关闭，清空表单
-                            this.clearModalForm(modalConfig);
-                            modal.style.display = 'none';
+                // 对于详情弹窗，检查是否有修改（而非是否有内容）
+                if (modalConfig.id === 'item-detail-modal' || modalConfig.id === 'subscription-detail-modal') {
+                    const originalValues = modal.dataset.originalValues ? JSON.parse(modal.dataset.originalValues) : {};
+                    console.log('检查详情弹窗修改:', modalConfig.id, '原始值:', originalValues);
+
+                    const hasChanges = modalConfig.inputs.some(selector => {
+                        const input = document.querySelector(selector);
+                        if (!input) return false;
+                        const currentValue = input.value || '';
+                        const originalValue = originalValues[selector] || '';
+                        const changed = currentValue !== originalValue;
+                        if (changed) {
+                            console.log('字段有修改:', selector, '原值:', originalValue, '当前值:', currentValue);
                         }
-                        // 取消时不做任何操作
-                    };
-                    this.showDialog('确认关闭', '您有未保存的内容，确定要关闭吗？', 'confirm');
+                        return changed;
+                    });
+
+                    console.log('是否有修改:', hasChanges);
+
+                    if (hasChanges) {
+                        // 有修改，询问用户是否保存
+                        this.dialogCallback = (confirmed) => {
+                            if (confirmed) {
+                                modal.style.display = 'none';
+                            }
+                        };
+                        this.showDialog('确认关闭', '您有未保存的修改，确定要关闭吗？', 'confirm');
+                    } else {
+                        // 没有修改，直接关闭
+                        modal.style.display = 'none';
+                    }
                 } else {
-                    // 没有输入内容，直接关闭
-                    modal.style.display = 'none';
+                    // 对于其他弹窗，检查是否有输入内容
+                    const hasInput = modalConfig.inputs.some(selector => {
+                        const input = document.querySelector(selector);
+                        return input && input.value && input.value.trim() !== '';
+                    });
+
+                    if (hasInput) {
+                        // 有输入内容，询问用户是否保存
+                        this.dialogCallback = (confirmed) => {
+                            if (confirmed) {
+                                this.clearModalForm(modalConfig);
+                                modal.style.display = 'none';
+                            }
+                        };
+                        this.showDialog('确认关闭', '您有未保存的内容，确定要关闭吗？', 'confirm');
+                    } else {
+                        // 没有输入内容，直接关闭
+                        modal.style.display = 'none';
+                    }
                 }
             }
             
@@ -8949,7 +9592,25 @@
                 };
                 return iconNames[icon] || icon;
             }
-            
+
+            // 获取订阅图标的中文名称
+            getSubscriptionIconName(icon) {
+                const iconNames = {
+                    '🎬': '场记板', '🎞️': '胶片', '📺': '电视', '🎵': '音符', '🎤': '话筒', '🎧': '耳机', '🎸': '吉他', '🎹': '钢琴', '🎺': '小号',
+                    '🎻': '小提琴', '🪕': '班卓琴', '🥁': '鼓', '🪘': '长鼓', '🎷': '萨克斯', '🎮': '游戏机', '🕹️': '摇杆',
+                    '🎰': '老虎机', '🎲': '骰子', '🎳': '保龄球', '🃏': '国际象棋', '🀄': '围棋', '🎱': '台球', '🎯': '靶心',
+                    '📚': '书籍', '📖': '书本', '💻': '电脑', '⌨️': '键盘', '🖥️': '显示器', '🖨️': '打印机', '💾': '软盘',
+                    '🏠': '房子', '✈️': '飞机', '🍔': '汉堡', '☕': '咖啡', '💊': '药丸', '👕': 'T恤', '⚽': '足球',
+                    '🏋️': '举重', '🎨': '调色板', '🔧': '扳手', '🎁': '礼物', '🎈': '气球', '🎉': '拉炮', '🎊': '糖果',
+                    '🔔': '铃铛', '🔕': '静音', '📿': '念珠', '⭐': '星星', '🌟': '闪星', '💫': '流星', '✨': '星光',
+                    '💰': '钱袋', '💵': '美元', '💴': '日元', '💶': '欧元', '💷': '英镑', '💳': '银行卡', '🧾': '收据',
+                    '⏱️': '秒表', '⏰': '闹钟', '🏦': '银行', '🏥': '医院', '🚗': '汽车', '🚕': '出租车', '🚌': '公交车',
+                    '🛒': '购物车', '🛍️': '购物袋', '👑': '皇冠', '💍': '戒指', '💎': '宝石', '💄': '口红',
+                    '🔮': '水晶球', '🎪': '马戏团', '🎭': '面具', '🏆': '奖杯', '🏅': '奖牌'
+                };
+                return iconNames[icon] || icon;
+            }
+
             // 添加分类
             addCategory() {
                 try {
