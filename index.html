@@ -1948,6 +1948,7 @@
                     </div>
                     <div style="display: flex; gap: 12px;">
                         <button id="manage-categories-btn" class="btn btn-secondary" style="padding: 8px 16px;">📁 管理分类</button>
+                        <button id="manage-channels-btn" class="btn btn-secondary" style="padding: 8px 16px;">🛒 管理购买方式</button>
                     </div>
                 </div>
 
@@ -2026,21 +2027,6 @@
                         </div>
                         <div class="calendar-days" id="subscription-calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;">
                             <!-- 日历日期将通过JavaScript动态生成 -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 统计图表 -->
-                <div style="margin-top: 32px;">
-                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">📈 支出统计</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
-                        <div class="chart-container">
-                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">月度支出趋势（最近12个月）</h4>
-                            <canvas id="subscription-timeline-chart"></canvas>
-                        </div>
-                        <div class="chart-container">
-                            <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600;">分类支出占比</h4>
-                            <canvas id="subscription-category-chart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -2352,32 +2338,6 @@
                             </div>
                             <div style="font-size: 24px; font-weight: 700;" id="stats-daily-average">¥0</div>
                             <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">元/天</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 快捷管理 -->
-                <div class="settings-section">
-                    <h4>快捷管理</h4>
-                    <p>快速管理分类和购买渠道</p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                        <!-- 分类管理卡片 -->
-                        <div class="quick-manage-card" id="category-manage-card">
-                            <div style="font-size: 32px; margin-bottom: 8px;">📁</div>
-                            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">分类管理</div>
-                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
-                                当前 <span id="category-count">0</span> 个分类
-                            </div>
-                            <button class="btn btn-secondary" style="width: 100%; font-size: 14px;">点击管理 →</button>
-                        </div>
-                        <!-- 购买渠道管理卡片 -->
-                        <div class="quick-manage-card" id="channel-manage-card">
-                            <div style="font-size: 32px; margin-bottom: 8px;">🛒</div>
-                            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">购买渠道管理</div>
-                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
-                                当前 <span id="channel-count">0</span> 个渠道
-                            </div>
-                            <button class="btn btn-secondary" style="width: 100%; font-size: 14px;">点击管理 →</button>
                         </div>
                     </div>
                 </div>
@@ -3338,14 +3298,44 @@
                 return false;
             }
 
-            // 删除购买渠道
+            // 删除购买渠道（将该渠道下的物品转移到"其他"渠道）
             deleteChannel(id) {
                 console.log('删除购买渠道:', id);
                 const channels = this.getChannels();
-                console.log('删除前的购买渠道:', channels);
-                // 确保ID比较时类型一致，同时支持数字和字符串
+
+                // 找到"其他"渠道
+                const otherChannel = channels.find(c => c.name === '其他');
+                if (!otherChannel) {
+                    console.error('未找到"其他"购买渠道');
+                    return false;
+                }
+
+                // 防止删除"其他"渠道本身
+                const channelToDelete = channels.find(c => c.id == id || c.id.toString() === id.toString());
+                if (!channelToDelete) {
+                    console.error('购买渠道不存在:', id);
+                    return false;
+                }
+
+                if (channelToDelete.name === '其他') {
+                    console.error('不能删除"其他"购买渠道');
+                    return false;
+                }
+
+                // 将属于该渠道的物品转移到"其他"渠道
+                const items = this.getItems();
+                const updatedItems = items.map(item => {
+                    if (item.purchaseChannel == id || item.purchaseChannel.toString() === id.toString()) {
+                        return { ...item, purchaseChannel: otherChannel.id };
+                    }
+                    return item;
+                });
+
+                // 保存更新后的物品
+                this.saveItems(updatedItems);
+
+                // 删除购买渠道
                 const filteredChannels = channels.filter(channel => channel.id != id && channel.id.toString() !== id.toString());
-                console.log('删除后的购买渠道:', filteredChannels);
                 const result = this.saveChannels(filteredChannels);
                 console.log('删除购买渠道结果:', result);
                 return result;
@@ -3629,7 +3619,8 @@
 
             updateSubscription(id, updates) {
                 const subscriptions = this.getSubscriptions();
-                const index = subscriptions.findIndex(s => s.id === id);
+                // 确保ID比较时类型一致，同时支持数字和字符串
+                const index = subscriptions.findIndex(s => s.id == id || s.id.toString() === id.toString());
                 if (index !== -1) {
                     subscriptions[index] = {
                         ...subscriptions[index],
@@ -3649,13 +3640,15 @@
 
             deleteSubscription(id) {
                 const subscriptions = this.getSubscriptions();
-                const filtered = subscriptions.filter(s => s.id !== id);
+                // 确保ID比较时类型一致，同时支持数字和字符串
+                const filtered = subscriptions.filter(s => s.id != id && s.id.toString() !== id.toString());
                 return this.saveSubscriptions(filtered);
             }
 
             getSubscriptionById(id) {
                 const subscriptions = this.getSubscriptions();
-                return subscriptions.find(s => s.id === id) || null;
+                // 确保ID比较时类型一致，同时支持数字和字符串
+                return subscriptions.find(s => s.id == id || s.id.toString() === id.toString()) || null;
             }
 
             // 计算下次扣费日期
@@ -4158,7 +4151,6 @@
                 this.app = app;
                 this.currentEditingSubscription = null;
                 this.currentCalendarDate = new Date();
-                this.charts = {};
             }
 
             // 渲染订阅面板
@@ -4166,7 +4158,6 @@
                 this.updateQuickStats();
                 this.renderSubscriptionCategoryTabs();
                 this.renderCalendar();
-                this.renderCharts();
                 this.renderSubscriptionList();
             }
 
@@ -4400,106 +4391,6 @@
                 modal.classList.remove('active');
             }
 
-            // 渲染图表
-            renderCharts() {
-                this.renderTimelineChart();
-                this.renderCategoryChart();
-            }
-
-            // 渲染月度趋势图
-            renderTimelineChart() {
-                const canvas = document.getElementById('subscription-timeline-chart');
-                if (!canvas) return;
-
-                const trend = this.manager.getMonthlyTrend();
-                const labels = trend.map(t => t.label);
-                const data = trend.map(t => t.amount);
-
-                if (this.charts.timeline) {
-                    this.charts.timeline.destroy();
-                }
-
-                this.charts.timeline = new Chart(canvas, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: '月度支出',
-                            data: data,
-                            borderColor: '#4361ee',
-                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: value => '¥' + value
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-
-            // 渲染分类占比图
-            renderCategoryChart() {
-                const canvas = document.getElementById('subscription-category-chart');
-                if (!canvas) return;
-
-                const today = new Date();
-                const expenses = this.manager.getCategoryExpenses(today.getFullYear(), today.getMonth() + 1);
-
-                if (expenses.length === 0) {
-                    // 没有数据时显示空状态
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.font = '14px sans-serif';
-                    ctx.fillStyle = '#9ca3af';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('本月暂无扣费', canvas.width / 2, canvas.height / 2);
-                    return;
-                }
-
-                const labels = expenses.map(e => e.category);
-                const data = expenses.map(e => e.amount);
-                const colors = ['#4361ee', '#3f37c9', '#4cc9f0', '#f72585', '#4ade80', '#fbbf24', '#f87171'];
-
-                if (this.charts.category) {
-                    this.charts.category.destroy();
-                }
-
-                this.charts.category = new Chart(canvas, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: colors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                position: 'right'
-                            }
-                        }
-                    }
-                });
-            }
-
             // 打开添加订阅对话框
             openAddSubscriptionDialog() {
                 console.log('openAddSubscriptionDialog 被调用');
@@ -4677,6 +4568,7 @@
                 if (result) {
                     this.closeSubscriptionDialog();
                     this.renderSubscriptionPanel();
+                    this.app.updateStats(); // 更新全局统计
                     this.app.showToast(this.currentEditingSubscription ? '订阅更新成功！' : '订阅添加成功！', 'success');
                 } else {
                     this.app.showToast('操作失败，请重试！', 'error');
@@ -4690,6 +4582,7 @@
                         const result = this.storage.deleteSubscription(id);
                         if (result) {
                             this.renderSubscriptionPanel();
+                            this.app.updateStats(); // 更新全局统计
                             this.app.showToast('订阅删除成功！', 'success');
                         } else {
                             this.app.showToast('删除失败，请重试！', 'error');
@@ -4797,9 +4690,10 @@
                     reminderDays
                 };
 
-                const result = this.storage.updateSubscription(updatedSubscription);
+                const result = this.storage.updateSubscription(this.currentEditingSubscription.id, updatedSubscription);
                 if (result) {
                     this.renderSubscriptionPanel();
+                    this.app.updateStats(); // 更新全局统计
                     this.closeSubscriptionDetail();
                     this.app.showToast('订阅更新成功！', 'success');
                 } else {
@@ -4825,6 +4719,7 @@
                         const result = this.storage.deleteSubscription(this.currentEditingSubscription.id);
                         if (result) {
                             this.renderSubscriptionPanel();
+                            this.app.updateStats(); // 更新全局统计
                             this.closeSubscriptionDetail();
                             this.app.showToast('订阅删除成功！', 'success');
                         } else {
@@ -7923,12 +7818,7 @@
             
             // 渲染分类列表（更新快捷卡片计数）
             renderCategories() {
-                console.log('更新分类计数');
-                const categories = this.storage.getCategories();
-                const categoryCount = document.getElementById('category-count');
-                if (categoryCount) {
-                    categoryCount.textContent = categories.length;
-                }
+                // 快捷卡片已移除，此方法保留以兼容现有调用
             }
 
             // 在管理弹窗中渲染分类列表
@@ -8049,12 +7939,7 @@
 
             // 渲染购买渠道列表（更新快捷卡片计数）
             renderChannels() {
-                console.log('更新购买渠道计数');
-                const channels = this.storage.getChannels();
-                const channelCount = document.getElementById('channel-count');
-                if (channelCount) {
-                    channelCount.textContent = channels.length;
-                }
+                // 快捷卡片已移除，此方法保留以兼容现有调用
             }
 
             // 在管理弹窗中渲染购买渠道列表
@@ -8071,17 +7956,36 @@
                 const channels = this.storage.getChannels();
                 console.log('获取到的购买渠道数量:', channels.length);
 
-                channels.forEach(channel => {
+                // 排序：把"其他"渠道放在最后
+                const sortedChannels = [...channels].sort((a, b) => {
+                    if (a.name === '其他') return 1;
+                    if (b.name === '其他') return -1;
+                    return 0;
+                });
+
+                sortedChannels.forEach(channel => {
                     console.log('渲染购买渠道:', channel.name);
                     const item = document.createElement('div');
                     item.className = 'manage-item';
-                    item.innerHTML = `
-                        <div class="manage-item-name">${channel.name}</div>
-                        <div class="manage-item-actions">
-                            <button class="edit" data-id="${channel.id}">编辑</button>
-                            <button class="delete" data-id="${channel.id}">删除</button>
-                        </div>
-                    `;
+
+                    // "其他"渠道不显示编辑和删除按钮
+                    const isOther = channel.name === '其他';
+                    if (isOther) {
+                        item.innerHTML = `
+                            <div class="manage-item-name">${channel.name}</div>
+                            <div class="manage-item-actions">
+                                <span style="color: var(--text-light); font-size: 12px;">默认渠道</span>
+                            </div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <div class="manage-item-name">${channel.name}</div>
+                            <div class="manage-item-actions">
+                                <button class="edit" data-id="${channel.id}">编辑</button>
+                                <button class="delete" data-id="${channel.id}">删除</button>
+                            </div>
+                        `;
+                    }
                     manageList.appendChild(item);
                 });
 
@@ -8285,6 +8189,12 @@
                     return;
                 }
 
+                // 防止编辑"其他"渠道
+                if (channel.name === '其他') {
+                    this.showToast('不能编辑默认购买渠道！', 'error');
+                    return;
+                }
+
                 this.prompt('编辑购买渠道', '请输入新的购买渠道名称:', channel.name, (confirmed, channelName) => {
                     if (confirmed) {
                         const trimmedName = channelName?.trim();
@@ -8310,7 +8220,23 @@
             // 在弹窗中删除购买渠道
             deleteChannelInModal(id) {
                 console.log('删除购买渠道:', id);
-                this.confirm('删除购买渠道', '确定要删除这个购买渠道吗？', (confirmed) => {
+                const channel = this.storage.getChannelById(id);
+                if (!channel) {
+                    console.error('购买渠道不存在:', id);
+                    this.showToast('购买渠道不存在！', 'error');
+                    return;
+                }
+
+                // 计算使用该渠道的物品数量
+                const items = this.storage.getItems();
+                const itemsCount = items.filter(item => item.purchaseChannel == id || item.purchaseChannel.toString() === id.toString()).length;
+
+                let message = `确定要删除购买渠道"${channel.name}"吗？\n\n该渠道下的物品将自动归类到"其他"渠道中。`;
+                if (itemsCount > 0) {
+                    message = `确定要删除购买渠道"${channel.name}"吗？\n\n该渠道下有 ${itemsCount} 个物品，将被自动归类到"其他"渠道中。`;
+                }
+
+                this.confirm('删除购买渠道', message, (confirmed) => {
                     if (confirmed) {
                         const result = this.storage.deleteChannel(id);
                         console.log('删除购买渠道结果:', result);
@@ -8318,6 +8244,7 @@
                             this.renderChannelManageList();
                             this.renderChannels();
                             this.initChannelSelects();
+                            this.renderItems(); // 重新渲染物品列表以更新显示
                             this.showToast('购买渠道删除成功！', 'success');
                         } else {
                             this.showToast('购买渠道删除失败，请重试！', 'error');
@@ -8360,6 +8287,12 @@
                     return;
                 }
 
+                // 防止编辑"其他"渠道
+                if (channel.name === '其他') {
+                    this.showToast('不能编辑默认购买渠道！', 'error');
+                    return;
+                }
+
                 this.prompt('编辑购买渠道', '请输入新的购买渠道名称:', channel.name, (confirmed, channelName) => {
                     if (confirmed) {
                         const trimmedName = channelName?.trim();
@@ -8384,13 +8317,36 @@
             // 删除购买渠道
             deleteChannel(id) {
                 console.log('删除购买渠道:', id);
-                this.confirm('删除购买渠道', '确定要删除这个购买渠道吗？', (confirmed) => {
+                const channel = this.storage.getChannelById(id);
+                if (!channel) {
+                    console.error('购买渠道不存在:', id);
+                    this.showToast('购买渠道不存在！', 'error');
+                    return;
+                }
+
+                // 防止删除"其他"渠道
+                if (channel.name === '其他') {
+                    this.showToast('不能删除默认购买渠道！', 'error');
+                    return;
+                }
+
+                // 计算使用该渠道的物品数量
+                const items = this.storage.getItems();
+                const itemsCount = items.filter(item => item.purchaseChannel == id || item.purchaseChannel.toString() === id.toString()).length;
+
+                let message = `确定要删除购买渠道"${channel.name}"吗？\n\n该渠道下的物品将自动归类到"其他"渠道中。`;
+                if (itemsCount > 0) {
+                    message = `确定要删除购买渠道"${channel.name}"吗？\n\n该渠道下有 ${itemsCount} 个物品，将被自动归类到"其他"渠道中。`;
+                }
+
+                this.confirm('删除购买渠道', message, (confirmed) => {
                     if (confirmed) {
                         const result = this.storage.deleteChannel(id);
                         console.log('删除购买渠道结果:', result);
                         if (result) {
                             this.renderChannels();
                             this.initChannelSelects();
+                            this.renderItems(); // 重新渲染物品列表以更新显示
                             this.showToast('购买渠道删除成功！', 'success');
                         } else {
                             this.showToast('购买渠道删除失败，请重试！', 'error');
@@ -8740,27 +8696,18 @@
                     });
                 }
 
-                // 快捷管理卡片点击事件
-                console.log('开始绑定快捷管理卡片点击事件');
-                const categoryManageCard = document.getElementById('category-manage-card');
-                const channelManageCard = document.getElementById('channel-manage-card');
+                // 物品界面管理按钮
                 const manageCategoriesBtn = document.getElementById('manage-categories-btn');
+                const manageChannelsBtn = document.getElementById('manage-channels-btn');
 
-                if (categoryManageCard) {
-                    categoryManageCard.addEventListener('click', () => {
-                        this.openCategoryManageModal();
-                    });
-                }
-
-                // 物品界面"管理分类"按钮
                 if (manageCategoriesBtn) {
                     manageCategoriesBtn.addEventListener('click', () => {
                         this.openCategoryManageModal();
                     });
                 }
 
-                if (channelManageCard) {
-                    channelManageCard.addEventListener('click', () => {
+                if (manageChannelsBtn) {
+                    manageChannelsBtn.addEventListener('click', () => {
                         this.openChannelManageModal();
                     });
                 }
